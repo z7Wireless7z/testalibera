@@ -766,7 +766,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 31 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 32 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1519,12 +1519,16 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <div class="hbody">
           <p>I tuoi dati restano <b>solo su questo telefono</b>. Non vanno su internet e nessuno li vede. Il rovescio della medaglia: se il telefono si rompe o cancelli i dati del browser, <b>si perdono</b>. Per questo esiste il backup.</p>
           <ul>
+            <li><b>Manda il backup su Drive, WhatsApp o email</b>: apre il menu "Condividi" del telefono. Scegli dove mandarlo, per esempio Google Drive o una mail a te stesso: così il backup è al sicuro anche se perdi il telefono. Compare solo nell'app installata.</li>
+            <li><b>Manda il backup su Drive, WhatsApp o email</b>: apre il menu "Condividi" del telefono. Scegli dove mandarlo, per esempio Google Drive o una mail a te stesso: così il backup è al sicuro anche se perdi il telefono. Ogni backup è un file nuovo con la data nel nome, quindi non cancella quelli di prima. Compare solo nell'app installata.</li>
             <li><b>Salva file di backup</b>: crea un file con tutto dentro, nella cartella Download del telefono.</li>
             <li><b>Copia il backup</b>: copia tutto come testo. Puoi incollarlo in una nota o mandarlo via mail a te stesso.</li>
             <li><b>Ripristina</b>: scegli un file di backup, o incolla il testo, per riportare tutto com'era. Attenzione: sostituisce i dati che hai adesso.</li>
             <li><b>Azzera tutti i dati</b>: cancella tutto e ricomincia da zero.</li>
             <li><b>Aspetto</b>: scegli i colori dell'app. <b>Blu notte</b> (scuro, quello di partenza), <b>Chiaro</b> (sfondo color carta) oppure <b>Automatico</b> (segue il telefono: chiaro di giorno, scuro se il telefono è in modalità scura).</li>
           </ul>
+          <p><b>Cassetto protetto 🔒</b>: nell'app installata, TestaLibera chiede ad Android di non cancellare mai i suoi dati, nemmeno quando il telefono è pieno. Lo vedi scritto in alto, in Dati e backup.</p>
+          <p><b>Cassetto protetto 🔒</b>: nell'app installata, TestaLibera chiede ad Android di non cancellare mai i suoi dati, nemmeno quando il telefono è pieno. Lo vedi scritto in alto, in Dati e backup.</p>
           <p>Il <b>pallino arancione</b> sull'icona del backup ti ricorda che non lo fai da più di 7 giorni.</p>
           <div class="tip"><b>Consiglio</b> Fai un backup una volta a settimana, ad esempio la domenica sera. Ci vogliono 10 secondi.</div>
         </div>
@@ -1641,7 +1645,8 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
       <div class="card">
         <div class="status" id="stStatus"><i></i><span></span></div>
         <p id="stLast" style="margin:8px 0 0"></p>
-        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 31</p>
+        <p id="stProt" style="margin:6px 0 0;font-size:13px" hidden></p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 32</p>
       </div>
       <div class="card">
         <h4>Aspetto</h4>
@@ -1656,6 +1661,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
       <div class="card">
         <h4>Fai un backup</h4>
         <p>Salva una copia di tutto in un file. Se cambi telefono o cancelli i dati del browser, la ripristini da qui.</p>
+        <button class="btn btn-primary" id="expShare" style="width:100%;margin-bottom:8px" hidden>Manda il backup su Drive, WhatsApp o email</button>
         <div class="btns">
           <button class="btn btn-violet" id="expFile">Salva file di backup</button>
           <button class="btn btn-quiet" id="expCopy">Copia il backup</button>
@@ -3122,7 +3128,24 @@ function renderSettings(){
   st.className="status"+(storageOk?"":" bad");
   st.querySelector("span").textContent=storageOk?"Salvataggio automatico attivo su questo telefono":"Il salvataggio non funziona in questa finestra: fai subito un backup";
   const n=S.items.filter(i=>!i.ex).length;
+  const pr=$("stProt"); if(storeProtected!==null){pr.hidden=false;pr.textContent=storeProtected?"🔒 Cassetto protetto: Android non cancellerà i tuoi dati nemmeno se il telefono è pieno.":"Cassetto non ancora protetto. Lo decide Android: di solito lo concede quando usi l'app installata da qualche giorno. L'app lo richiede ogni volta che la apri; intanto il backup ti tiene al sicuro.";}
   $("stLast").textContent=(S.lastBackup?"Ultimo backup: "+fmtDateTime(S.lastBackup)+".":"Non hai ancora fatto nessun backup.")+" "+n+(n===1?" elemento salvato.":" elementi salvati.");
+}
+// ---------- protezione del cassetto e condivisione del backup ----------
+var storeProtected=null;
+try{ if(navigator.storage&&navigator.storage.persisted){
+  navigator.storage.persisted().then(p=>p||(navigator.storage.persist?navigator.storage.persist():false)).then(p=>{storeProtected=!!p;try{renderSettings();}catch(e){}}).catch(()=>{});
+}}catch(e){}
+function backupFile(){return new File([backupText()],"testalibera-backup-"+today()+".json",{type:"application/json"});}
+function canShareBackup(){try{return !!(navigator.share&&navigator.canShare&&navigator.canShare({files:[backupFile()]}));}catch(e){return false;}}
+async function shareBackup(){
+  try{
+    await navigator.share({files:[backupFile()],title:"Backup TestaLibera",text:"Backup di TestaLibera del "+new Date().toLocaleDateString("it-IT")});
+    markBackup(); toast("Backup mandato ✓");
+  }catch(e){
+    if(e&&e.name==="AbortError") return; // l'utente ha chiuso il menu
+    exportFile();
+  }
 }
 function markBackup(){S.lastBackup=nowIso();save();renderSettings();renderHeader();}
 function exportFile(){
@@ -3421,7 +3444,7 @@ document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{
 $("setBtn").onclick=()=>{renderSettings();$("expText").hidden=true;$("impPasteBox").hidden=true;openSheet("setSheet");};
 document.querySelectorAll("[data-close]").forEach(b=>b.onclick=()=>closeSheet(b.dataset.close));
 document.querySelectorAll(".overlay:not(.confirm-ov)").forEach(o=>o.addEventListener("click",e=>{if(e.target===o)closeSheet(o.id);}));
-$("expFile").onclick=exportFile;
+$("expFile").onclick=exportFile; $("expShare").hidden=!canShareBackup(); $("expShare").onclick=shareBackup;
 document.querySelectorAll("#themeSeg button").forEach(b=>b.onclick=()=>{S.theme=b.dataset.th;save();applyTheme();}); $("expCopy").onclick=exportCopy;
 $("impFileBtn").onclick=()=>$("impFile").click();
 $("impFile").onchange=e=>{
