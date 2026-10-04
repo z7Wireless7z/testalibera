@@ -799,7 +799,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 33 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 34 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1740,7 +1740,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <div class="status" id="stStatus"><i></i><span></span></div>
         <p id="stLast" style="margin:8px 0 0"></p>
         <p id="stProt" style="margin:6px 0 0;font-size:13px" hidden></p>
-        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 33</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 34</p>
       </div>
       <div class="card">
         <h4>Aspetto</h4>
@@ -3725,15 +3725,18 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)stopMic();}
 })();
 
 // ===== La tua settimana: si apre da sola domenica sera e lunedì =====
-(function(){
+// controlla all'apertura, quando torni nell'app (anche se era rimasta aperta in sottofondo) e dopo il benvenuto
+function autoWeek(){
   if(!S.onboarded) return;
   const off=bannerWeekOff(); if(off===null) return;
   const now=new Date(); if(off===0&&now.getHours()<18) return;
   const any=S.items.some(i=>i.done&&!i.ex)||S.habits.some(h=>h.hist.length);
   if(!any||S.weekSeen===weekKey(off)) return;
-  if(new URLSearchParams(location.search).get("azione")) return;
-  setTimeout(()=>{if(!document.querySelector(".overlay.show"))openWeek(off);},700);
-})();
+  if(document.querySelector(".overlay.show")||$("obView").classList.contains("show")) return;
+  openWeek(off);
+}
+if(!new URLSearchParams(location.search).get("azione")) setTimeout(autoWeek,700);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){renderBanner();setTimeout(autoWeek,500);}});
 // ===== Benvenuto =====
 (function(){
   const v=$("obView"), steps=[...v.querySelectorAll(".ob-step")], dots=[...$("obDots").children];
@@ -3741,7 +3744,7 @@ document.addEventListener("visibilitychange",()=>{if(document.hidden)stopMic();}
   $("obImg").src=document.querySelector(".brand-ico").src;
   function show(){steps.forEach(st=>st.style.transform=`translateX(${-k*100}%)`);dots.forEach((d,j)=>d.classList.toggle("on",j===k));
     $("obNext").textContent=k===steps.length-1?"Inizia":"Avanti";$("obSkip").style.visibility=k===steps.length-1?"hidden":"visible";}
-  function close(){v.classList.remove("show");document.body.style.overflow="";if(!S.onboarded){S.onboarded=true;save();}}
+  function close(){v.classList.remove("show");document.body.style.overflow="";if(!S.onboarded){S.onboarded=true;save();}setTimeout(()=>{try{autoWeek();}catch(e){}},600);}
   window.openWelcome=function(){k=0;show();v.classList.add("show");document.body.style.overflow="hidden";};
   $("obNext").onclick=()=>{if(k<steps.length-1){k++;show();}else close();};
   $("obSkip").onclick=close;
