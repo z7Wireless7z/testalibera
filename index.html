@@ -799,7 +799,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 34 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 35 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1614,7 +1614,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
           <p>I tuoi dati restano <b>solo su questo telefono</b>. Non vanno su internet e nessuno li vede. Il rovescio della medaglia: se il telefono si rompe o cancelli i dati del browser, <b>si perdono</b>. Per questo esiste il backup.</p>
           <ul>
             <li><b>Manda il backup su Drive, WhatsApp o email</b>: apre il menu "Condividi" del telefono. Scegli dove mandarlo, per esempio Google Drive o una mail a te stesso: così il backup è al sicuro anche se perdi il telefono. Compare solo nell'app installata.</li>
-            <li><b>Manda il backup su Drive, WhatsApp o email</b>: apre il menu "Condividi" del telefono. Scegli dove mandarlo, per esempio Google Drive o una mail a te stesso: così il backup è al sicuro anche se perdi il telefono. Ogni backup è un file nuovo con la data nel nome, quindi non cancella quelli di prima. Compare solo nell'app installata.</li>
+            <li><b>Manda il backup su Drive, WhatsApp o email</b>: apre il menu "Condividi" del telefono. Scegli dove mandarlo, per esempio Google Drive o una mail a te stesso: così il backup è al sicuro anche se perdi il telefono. Ogni backup è un file nuovo con la data nel nome, quindi non cancella quelli di prima. Il file mandato così finisce in <b>.txt</b> (Android non permette di condividere altri tipi): per ripristinarlo va benissimo, scegli quello. Compare solo nell'app installata.</li>
             <li><b>Salva file di backup</b>: crea un file con tutto dentro, nella cartella Download del telefono.</li>
             <li><b>Copia il backup</b>: copia tutto come testo. Puoi incollarlo in una nota o mandarlo via mail a te stesso.</li>
             <li><b>Ripristina</b>: scegli un file di backup, o incolla il testo, per riportare tutto com'era. Attenzione: sostituisce i dati che hai adesso.</li>
@@ -1740,7 +1740,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <div class="status" id="stStatus"><i></i><span></span></div>
         <p id="stLast" style="margin:8px 0 0"></p>
         <p id="stProt" style="margin:6px 0 0;font-size:13px" hidden></p>
-        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 34</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 35</p>
       </div>
       <div class="card">
         <h4>Aspetto</h4>
@@ -1769,7 +1769,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
           <button class="btn btn-quiet" id="impFileBtn">Scegli file…</button>
           <button class="btn btn-quiet" id="impPasteBtn">Incolla testo</button>
         </div>
-        <input class="file-in" type="file" id="impFile" accept=".json,application/json,text/plain">
+        <input class="file-in" type="file" id="impFile" accept=".json,.txt,application/json,text/plain">
         <div id="impPasteBox" hidden>
           <textarea class="backup-text" id="impText" placeholder="Incolla qui il testo del backup" aria-label="Testo da importare"></textarea>
           <button class="btn btn-violet" id="impTextGo" style="width:100%;margin-top:8px">Importa questo testo</button>
@@ -3256,14 +3256,16 @@ var storeProtected=null;
 try{ if(navigator.storage&&navigator.storage.persisted){
   navigator.storage.persisted().then(p=>p||(navigator.storage.persist?navigator.storage.persist():false)).then(p=>{storeProtected=!!p;try{renderSettings();}catch(e){}}).catch(()=>{});
 }}catch(e){}
-function backupFile(){return new File([backupText()],"testalibera-backup-"+today()+".json",{type:"application/json"});}
+// Android accetta di condividere solo certi tipi di file (testo sì, .json no): per questo il backup condiviso è un .txt
+function backupFile(){return new File([backupText()],"testalibera-backup-"+today()+".txt",{type:"text/plain"});}
 function canShareBackup(){try{return !!(navigator.share&&navigator.canShare&&navigator.canShare({files:[backupFile()]}));}catch(e){return false;}}
 async function shareBackup(){
   try{
-    await navigator.share({files:[backupFile()],title:"Backup TestaLibera",text:"Backup di TestaLibera del "+new Date().toLocaleDateString("it-IT")});
+    await navigator.share({files:[backupFile()]});
     markBackup(); toast("Backup mandato ✓");
   }catch(e){
     if(e&&e.name==="AbortError") return; // l'utente ha chiuso il menu
+    toast("Il telefono non mi lascia condividere il file: l'ho salvato in Download, da lì puoi caricarlo su Drive");
     exportFile();
   }
 }
