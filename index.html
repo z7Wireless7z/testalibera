@@ -654,6 +654,37 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
   *{transition:none!important}
 }
 
+
+/* ===== Svuota la testa ===== */
+.dump-open{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;padding:12px 14px;border-radius:14px;border:1px dashed var(--line-strong);background:transparent;color:var(--ink);text-align:left;font-family:var(--display)}
+.dump-open b{font-size:15px;font-weight:600;display:block}
+.dump-open small{font-family:var(--body);font-size:12.5px;color:var(--ink-faint)}
+.dump-open .ico{font-size:22px}
+.dump-ta{width:100%;min-height:46vh;resize:none;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;font:inherit;font-size:16px;line-height:1.7;color:var(--ink)}
+.dump-ta:focus{outline:2px solid var(--violet);outline-offset:1px}
+.dump-intro{font-size:14px;color:var(--ink-soft);margin:0 0 10px;line-height:1.5}
+.dump-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+.dump-row .btn{flex:1}
+.dump-date{display:inline-block;margin-top:10px;font-size:13px;font-weight:600;padding:5px 11px;border-radius:99px;background:var(--violet-soft);color:var(--ink)}
+.dump-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.dump-undo{display:block;margin:6px auto 0;background:none;border:none;color:var(--ink-faint);font-size:13px;padding:6px}
+.dump-sum{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0 18px;text-align:left}
+.dump-sum div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--ink-soft)}
+.dump-sum b{display:block;font-family:var(--display);font-size:22px;color:var(--ink)}
+.dump-newlist{display:flex;gap:6px;margin-top:8px}
+.dump-newlist input{flex:1;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:9px 11px;min-height:42px;color:var(--ink)}
+/* ===== Microfono ===== */
+.mic-btn{width:44px;height:44px;flex-shrink:0;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:19px;display:inline-flex;align-items:center;justify-content:center}
+.mic-btn.on{background:var(--red);border-color:var(--red);color:#fff;animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{50%{box-shadow:0 0 0 7px rgba(192,57,43,.18)}}
+.cap-foot .mic-btn{margin-left:auto;margin-right:6px}
+/* ===== Settimana: extra ===== */
+.wk-late{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.wk-late button.it{display:flex;justify-content:space-between;gap:10px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:9px 11px;color:var(--ink);font-size:14px}
+.wk-late button.it small{color:var(--red);white-space:nowrap;font-size:12px}
+.hab-rec{display:block;font-size:11.5px;color:var(--ink-faint);margin-top:2px}
+.hab-rec span{white-space:nowrap}
+@media (prefers-reduced-motion: reduce){.mic-btn.on{animation:none}}
 /* ===== Benvenuto ===== */
 .ob{position:fixed;inset:0;z-index:200;background:var(--paper);color:var(--ink);display:none;flex-direction:column;padding:max(14px,env(safe-area-inset-top)) 20px max(18px,env(safe-area-inset-bottom))}
 .ob.show{display:flex}
@@ -745,9 +776,11 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
           <button type="button" data-ct="note" aria-pressed="false">📝 Appunto</button>
           <button type="button" data-ct="task" aria-pressed="true">✓ Da fare</button>
         </div>
+        <button type="button" class="mic-btn" id="capMic" aria-label="Detta con la voce" title="Detta con la voce" hidden>🎤</button>
         <button class="cap-btn" id="capBtn">Cattura</button>
       </div>
     </div>
+    <button class="dump-open" id="dumpOpen"><span class="ico">🧠</span><span><b>Svuota la testa</b><small>Hai tanti pensieri? Scrivili tutti di getto, poi li smisti.</small></span></button>
     <div class="list" id="inboxList" style="margin-top:10px"></div>
 
     <div class="sec"><h2>In programma oggi</h2><span class="count" id="agendaCount" hidden></span></div>
@@ -766,7 +799,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 32 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 33 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1023,6 +1056,18 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
   </div>
 </div>
 
+<!-- Svuota la testa -->
+<div class="overlay" id="dumpSheet">
+  <div class="sheet" role="dialog" aria-label="Svuota la testa">
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0"><div class="sheet-title">Svuota la testa</div><div class="sheet-sub" id="dumpSub"></div></div>
+      <button class="sheet-close" data-close="dumpSheet" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="rev-prog"><i id="dumpBar"></i></div>
+    <div class="sheet-body" id="dumpBody"></div>
+  </div>
+</div>
+
 <!-- Guida -->
 <!-- Benvenuto -->
 <div class="ob" id="obView" role="dialog" aria-label="Benvenuto in TestaLibera">
@@ -1084,6 +1129,9 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <button class="pill" data-go="h-liste2">Sezione Liste</button>
         <button class="pill" data-go="h-tempo">Ho poco tempo</button>
         <button class="pill" data-go="h-scegli">Scegli tu</button>
+        <button class="pill" data-go="h-svuota">Svuota la testa</button>
+        <button class="pill" data-go="h-voce">Voce</button>
+        <button class="pill" data-go="h-icona">Scorciatoie</button>
         <button class="pill" data-go="h-settimana">La settimana</button>
         <button class="pill" data-go="h-scheda">La scheda</button>
         <button class="pill" data-go="h-res">Risultato</button>
@@ -1346,13 +1394,56 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         </div>
       </details>
 
+      <details class="hsec" id="h-svuota">
+        <summary><span class="hico">🧠</span><span class="htitle">Svuota la testa<small>tutti i pensieri fuori, in un colpo solo</small></span><span class="hchev">›</span></summary>
+        <div class="hbody">
+          <p>Quando hai la testa piena di cose, scriverle una alla volta stanca. Qui le butti fuori <b>tutte insieme</b> e poi decidi dove metterle.</p>
+          <h5>Come si usa</h5>
+          <ul>
+            <li>In <b>Oggi</b>, sotto la Cattura, tocca <b>"Svuota la testa"</b>.</li>
+            <li><b>Scrivi una cosa per riga</b>, senza pensare. Esempio: "chiamare il commercialista", "comprare il latte", "idea per un regalo". Puoi anche dettare col microfono 🎤.</li>
+            <li>Tocca <b>"Smista"</b>: ti ripropone i pensieri <b>uno alla volta</b>. Per ognuno scegli: <b>Da fare</b>, <b>Appunto</b>, <b>In una lista</b> (per esempio la spesa), <b>Lascia in Cattura</b> o <b>Butta</b>.</li>
+            <li>Se nel pensiero c'è una data ("domani alle 9…"), la vedi subito e la cosa da fare viene salvata con quella data.</li>
+            <li>Hai sbagliato? Tocca <b>"↩ Annulla l'ultima"</b>.</li>
+          </ul>
+          <div class="tip"><b>Consiglio</b> Se chiudi a metà non perdi niente: quello che hai scritto resta lì per la prossima volta.</div>
+        </div>
+      </details>
+
+      <details class="hsec" id="h-voce">
+        <summary><span class="hico">🎤</span><span class="htitle">Dettare con la voce<small>scrivi parlando</small></span><span class="hchev">›</span></summary>
+        <div class="hbody">
+          <p>Accanto al tasto <b>Cattura</b> c'è il microfono 🎤. Toccalo e parla: per esempio "domani alle 9 chiamare Marco". Il testo compare nella casella e l'app capisce già giorno e ora. Poi tocca <b>Cattura</b>.</p>
+          <ul>
+            <li>Mentre ascolta, il microfono diventa <b>rosso</b>. Toccalo di nuovo per fermarlo.</li>
+            <li>La prima volta il telefono ti chiede il permesso di usare il microfono: rispondi <b>"Consenti"</b>.</li>
+            <li>Funziona anche in <b>Svuota la testa</b>: ogni frase che detti va su una riga nuova.</li>
+            <li>Serve internet: la voce la trasforma in testo il riconoscimento vocale di Google, come quando detti sulla tastiera.</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="hsec" id="h-icona">
+        <summary><span class="hico">⤴</span><span class="htitle">Scorciatoie dall'icona<small>tieni premuto e vai dritto</small></span><span class="hchev">›</span></summary>
+        <div class="hbody">
+          <p>Se hai installato TestaLibera sul telefono, <b>tieni premuta la sua icona</b>: compare un menu con quattro scorciatoie.</p>
+          <ul>
+            <li><b>Nuova cosa da fare</b> e <b>Nuovo appunto</b>: apre la Cattura già pronta.</li>
+            <li><b>Svuota la testa</b>: apre subito la pagina per scrivere tutto.</li>
+            <li><b>Spesa</b>: apre la tua lista che si chiama "Spesa". Se non ce l'hai, creala nella sezione Liste.</li>
+          </ul>
+          <p>Puoi anche <b>trascinare</b> una scorciatoia sulla schermata del telefono: diventa un'icona a sé.</p>
+          <div class="tip"><b>Nota</b> Dopo un aggiornamento le scorciatoie possono metterci fino a un giorno a comparire. Se hai fretta, disinstalla l'app e reinstallala (prima fai il backup!).</div>
+        </div>
+      </details>
+
       <details class="hsec" id="h-settimana">
         <summary><span class="hico">▮</span><span class="htitle">La tua settimana<small>un riepilogo di cosa hai fatto</small></span><span class="hchev">›</span></summary>
         <div class="hbody">
           <p>Una schermata che ti mostra la tua settimana, da lunedì a domenica. Serve a <b>vedere i progressi</b>, che nei giorni pesanti si dimenticano facilmente.</p>
           <h5>Dove si trova</h5>
           <ul>
-            <li>La <b>domenica</b> in Oggi compare l'avviso "La tua settimana è pronta". Il <b>lunedì</b> compare "Com'è andata la settimana scorsa". Tocca <b>Guarda</b>, oppure la × per nasconderlo.</li>
+            <li>La <b>domenica sera</b> (dalle 18) e il <b>lunedì</b> si apre <b>da sola</b> la prima volta che apri l'app. Prima, la domenica, in Oggi vedi l'avviso "La tua settimana è pronta": tocca <b>Guarda</b>, oppure la × per nasconderlo.</li>
             <li>Quando vuoi: apri la <b>cartella gialla</b> (Completati) e tocca <b>"La tua settimana"</b>.</li>
           </ul>
           <h5>Cosa c'è dentro</h5>
@@ -1362,6 +1453,9 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
             <li><b>Giorno top</b>: il giorno in cui hai fatto di più.</li>
             <li>Un <b>grafico a colonne</b>: una colonna per giorno, più è alta più cose hai fatto. Tocca una colonna per vedere il numero. I giorni che devono ancora arrivare sono tratteggiati.</li>
             <li>Le <b>abitudini</b> giorno per giorno, con la serie più lunga in corso. Per quelle collegate contano solo i giorni previsti: ad esempio "3/4" vuol dire 3 volte su 4 giorni di palestra.</li>
+            <li>Accanto a ogni abitudine, la <b>serie in corso</b> 🔥 e il tuo <b>record</b> 🏆: la serie più lunga di sempre.</li>
+            <li><b>Rimasto indietro</b>: le cose da fare scadute. Tocca una per aprirla, oppure <b>"Spostale tutte a oggi"</b>.</li>
+            <li><b>In arrivo</b>: quante cose hai già in programma la settimana dopo.</li>
             <li>L'elenco di <b>tutto quello che hai fatto</b>, giorno per giorno (toccalo per aprirlo).</li>
           </ul>
           <p>Con le frecce <b>‹ ›</b> in alto puoi guardare le settimane passate.</p>
@@ -1646,7 +1740,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <div class="status" id="stStatus"><i></i><span></span></div>
         <p id="stLast" style="margin:8px 0 0"></p>
         <p id="stProt" style="margin:6px 0 0;font-size:13px" hidden></p>
-        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 32</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 33</p>
       </div>
       <div class="card">
         <h4>Aspetto</h4>
@@ -1940,7 +2034,7 @@ let confirmCb=null;
 function askConfirm(msg,onYes,yes){confirmCb=onYes;$("confirmMsg").textContent=msg;$("confirmYes").textContent=yes||"Elimina";$("confirmOv").classList.add("show");}
 function closeConfirm(){$("confirmOv").classList.remove("show");confirmCb=null;}
 const openSheets=[];
-function openSheet(id){$(id).classList.add("show");if(!openSheets.includes(id))openSheets.push(id);document.body.style.overflow="hidden";document.body.classList.add("sheet-open");}
+function openSheet(id){$(id).classList.add("show");if(!openSheets.includes(id))openSheets.push(id);$(id).style.zIndex=60+openSheets.indexOf(id);document.body.style.overflow="hidden";document.body.classList.add("sheet-open");}
 function closeSheet(id){
   $(id).classList.remove("show");const i=openSheets.indexOf(id);if(i>-1)openSheets.splice(i,1);
   if(!openSheets.length){document.body.style.overflow="";document.body.classList.remove("sheet-open");}
@@ -2459,6 +2553,19 @@ function renderCal(){
 function calMove(n){calCursor=new Date(calCursor.getFullYear(),calCursor.getMonth()+n,1);renderCal();}
 
 // ---------- ABITUDINI ----------
+// la serie più lunga di sempre (contano solo i giorni previsti)
+function bestStreak(h){
+  if(!h.hist.length) return 0;
+  const set=new Set(h.hist), first=[...h.hist].sort()[0], t=today();
+  let d=new Date(first+"T12:00:00"), best=0, run=0;
+  for(let k=0;k<4000;k++){
+    const ds=ymd(d); if(ds>t) break;
+    if(set.has(ds)){run++;if(run>best)best=run;}
+    else if(habSched(h,ds)&&ds<t) run=0;
+    d=addDays(d,1);
+  }
+  return Math.max(best,streak(h));
+}
 function streak(h){
   if(!h.hist.length) return 0; const set=new Set(h.hist), linked=!!linkedTask(h);
   let n=0, d=new Date(); d.setHours(0,0,0,0);
@@ -2794,10 +2901,13 @@ function weekData(off){
       n:days.filter(ds=>ds<=t&&sch(ds)&&h.hist.includes(ds)).length,
       m:days.filter(ds=>ds<=t&&sch(ds)).length,
       tot:days.filter(ds=>sch(ds)).length,
-      st:streak(h)};
+      st:streak(h),rec:bestStreak(h)};
   });
   const habDone=habits.reduce((a,h)=>a+h.n,0), habMax=habits.reduce((a,h)=>a+h.m,0);
-  return {mon,days,from,to,done,per,prev,elapsed,habits,habDone,habMax,isCurrent:off===0};
+  const late=S.items.filter(i=>i.task&&!i.done&&i.date&&i.date<t).sort((a,b)=>a.date.localeCompare(b.date));
+  const nf=ymd(addDays(mon,7)), nt=ymd(addDays(mon,13));
+  const next=S.items.filter(i=>i.task&&!i.done&&!i.ex&&i.date&&i.date>=nf&&i.date<=nt).length;
+  return {mon,days,from,to,done,per,prev,elapsed,habits,habDone,habMax,late,next,isCurrent:off===0};
 }
 function weekKey(off){return ymd(addDays(mondayOf(new Date()),off*7));}
 function openWeek(off){wkOff=off||0;S.weekSeen=weekKey(wkOff);save();renderWeek();openSheet("weekSheet");renderBanner();}
@@ -2834,10 +2944,20 @@ function renderWeek(){
       <div class="bar-days">${w.days.map((ds,k)=>`<span${ds===t?' class="today"':""}>${DAY1[k]}</span>`).join("")}</div>
       <div class="bar-cap" id="wkCap"></div></div>
     ${w.habits.length?`<div class="wk-card"><h4>Abitudini</h4><div class="sub">${topSt&&topSt.st>0?"Serie più lunga in corso: "+topSt.st+" di fila"+" ("+esc(topSt.name)+")":"Una spunta al giorno basta per ripartire"}</div>
-      ${w.habits.map(h=>`<div class="hab-wk"><span class="n">${esc(h.name)}</span><span class="hab-dots">${h.days.map(d=>`<i class="${d.on?"on":""}${d.fut?" fut":""}${d.rest?" rest":""}"></i>`).join("")}</span><span class="c">${h.n}/${h.tot}</span></div>`).join("")}</div>`:""}
+      ${w.habits.map(h=>`<div class="hab-wk"><span class="n">${esc(h.name)}<span class="hab-rec"><span>🔥 ${h.st} di fila</span> · <span>🏆 record ${h.rec}</span></span></span><span class="hab-dots">${h.days.map(d=>`<i class="${d.on?"on":""}${d.fut?" fut":""}${d.rest?" rest":""}"></i>`).join("")}</span><span class="c">${h.n}/${h.tot}</span></div>`).join("")}</div>`:""}
+    ${w.isCurrent||wkOff===-1?`<div class="wk-card"><h4>Rimasto indietro</h4><div class="sub">${w.late.length?w.late.length+" "+(w.late.length===1?"cosa scaduta":"cose scadute")+": tocca per aprirla":"Niente di scaduto. Ottimo lavoro!"}</div>
+      ${w.late.length?`<div class="wk-late">${w.late.slice(0,5).map(i=>`<button class="it" data-late="${esc(i.id)}"><span>${esc(i.title||firstLine(i.body)||"(senza titolo)")}</span><small>${esc(dayLabel(i.date,true))}</small></button>`).join("")}${w.late.length>5?`<div class="sub">…e altre ${w.late.length-5}</div>`:""}<button class="btn btn-quiet" id="wkLateAll" style="margin-top:4px">Spostale tutte a oggi</button></div>`:""}
+    </div>
+    <div class="wk-card"><h4>In arrivo</h4><div class="sub">${w.next?"La settimana dopo hai già "+w.next+" "+(w.next===1?"cosa":"cose")+" in programma.":"La settimana dopo è ancora libera."}</div></div>`:""}
     ${byDay.length?`<div class="wk-card"><details><summary>Tutto quello che hai fatto (${total})</summary>
       ${byDay.map(o=>`<div class="wk-day">${esc(dayLabel(o.ds,true))}</div>${o.its.map(x=>`<div class="wk-done">${esc(x.i.step&&!x.i.title?x.i.step:(x.i.title||firstLine(x.i.body)||"(senza titolo)"))}${x.i.result?`<small>${esc(x.i.result)}</small>`:""}</div>`).join("")}`).join("")}
     </details></div>`:""}`;
+  $("wkBody").querySelectorAll("[data-late]").forEach(b=>b.onclick=()=>openEditor(b.dataset.late));
+  const la=$("wkLateAll"); if(la) la.onclick=()=>{
+    const t0=today(), moved=w.late.map(i=>({i,d:i.date}));
+    moved.forEach(o=>{o.i.date=t0;touch(o.i);}); save(); renderAll(); renderWeek();
+    toast(moved.length+(moved.length===1?" cosa spostata":" cose spostate")+" a oggi","Annulla",()=>{moved.forEach(o=>{o.i.date=o.d;touch(o.i);});save();renderAll();renderWeek();});
+  };
   const cap=$("wkCap");
   const showCap=k=>{
     $("wkBars").querySelectorAll(".bar-col").forEach(b=>b.classList.toggle("sel",+b.dataset.k===k));
@@ -3497,6 +3617,123 @@ renderHeader();
 })();
 if(migratedMsg) setTimeout(()=>toast(migratedMsg),400);
 
+
+// ===== Svuota la testa =====
+let dump={phase:"write",lines:[],i:0,stack:[],panel:null,n:{task:0,note:0,list:0,inbox:0,trash:0}};
+function openDump(){
+  dump={phase:"write",lines:[],i:0,stack:[],panel:null,n:{task:0,note:0,list:0,inbox:0,trash:0}};
+  renderDump(); openSheet("dumpSheet");
+  setTimeout(()=>{const t=$("dumpTa");if(t)t.focus();},300);
+}
+function dumpLines(){return (S.dumpDraft||"").split("\n").map(x=>x.replace(/^[\s\-•*·]+/,"").trim()).filter(Boolean);}
+function renderDump(){
+  const body=$("dumpBody"), bar=$("dumpBar");
+  if(dump.phase==="write"){
+    bar.style.width="0%";
+    const n=dumpLines().length;
+    $("dumpSub").textContent=n?n+(n===1?" pensiero":" pensieri"):"scrivi tutto, poi smisti";
+    body.innerHTML=`<p class="dump-intro"><b>Una riga = un pensiero.</b> Non pensare a dove metterli: scrivi e basta. Dopo li smistiamo insieme, uno alla volta.</p>
+      <textarea class="dump-ta" id="dumpTa" placeholder="chiamare il commercialista&#10;comprare il latte&#10;domani alle 18 palestra&#10;idea per il regalo…" aria-label="I tuoi pensieri, uno per riga"></textarea>
+      <div class="dump-row">${micOk()?'<button type="button" class="mic-btn" id="dumpMic" aria-label="Detta con la voce">🎤</button>':""}<button class="btn btn-primary" id="dumpGo" ${n?"":"disabled"}>Smista ${n?"("+n+")":""}</button></div>`;
+    const ta=$("dumpTa"); ta.value=S.dumpDraft||"";
+    ta.oninput=()=>{S.dumpDraft=ta.value;save();const k=dumpLines().length;$("dumpGo").disabled=!k;$("dumpGo").textContent="Smista"+(k?" ("+k+")":"");$("dumpSub").textContent=k?k+(k===1?" pensiero":" pensieri"):"scrivi tutto, poi smisti";};
+    $("dumpGo").onclick=()=>{dump.lines=dumpLines();dump.i=0;dump.phase="sort";stopMic();renderDump();};
+    const mb=$("dumpMic"); if(mb) mb.onclick=()=>toggleMic(mb,txt=>{const v=ta.value.replace(/\s+$/,"");ta.value=(v?v+"\n":"")+txt.trim()+"\n";ta.oninput();ta.scrollTop=ta.scrollHeight;},true);
+    return;
+  }
+  const total=dump.lines.length;
+  if(dump.phase==="end"||dump.i>=total){
+    dump.phase="end"; bar.style.width="100%"; $("dumpSub").textContent="Finito";
+    S.dumpDraft=""; save();
+    const c=dump.n, box=(v,l1,l2)=>v?`<div><b>${v}</b>${v===1?l1:l2}</div>`:"";
+    body.innerHTML=`<div class="rev-end"><div class="big">Testa più leggera ✓</div><p>Hai smistato ${total} ${total===1?"pensiero":"pensieri"}. Ora sono al loro posto: non devi più tenerli a mente.</p>
+      <div class="dump-sum">${box(c.task,"cosa da fare","cose da fare")}${box(c.note,"appunto","appunti")}${box(c.list,"in una lista","nelle liste")}${box(c.inbox,"in Cattura","in Cattura")}${box(c.trash,"buttato","buttati")}</div>
+      <button class="btn btn-violet" id="dumpEnd">Chiudi</button></div>`;
+    $("dumpEnd").onclick=()=>closeSheet("dumpSheet"); return;
+  }
+  bar.style.width=(dump.i/total*100)+"%";
+  $("dumpSub").textContent=(dump.i+1)+" di "+total;
+  const line=dump.lines[dump.i], p=parseQuick(line);
+  body.innerHTML=`<div class="rev-card"><div class="rev-kind">Pensiero ${dump.i+1}</div><div class="rev-title">${esc(line)}</div>${p.date?`<span class="dump-date">📅 ${esc(whenLabel(p.date,p.time,p))}</span>`:""}</div>
+    <p class="rev-q">Dove lo mettiamo?</p>
+    <div class="dump-grid">
+      <button class="rev-btn day" data-d="task">✓ Da fare<small>${p.date?"con la data":"senza data"}</small></button>
+      <button class="rev-btn day" data-d="note">📝 Appunto<small>da ricordare</small></button>
+      <button class="rev-btn${dump.panel==="list"?" on":""}" data-d="list">🛒 In una lista<small>spesa, cose da comprare…</small></button>
+      <button class="rev-btn" data-d="inbox">📥 Lascia in Cattura<small>ci penso dopo</small></button>
+    </div>
+    ${dump.panel==="list"?`<div class="rev-sub"><div class="rev-cols">${S.lists.map(l=>`<button class="pill" data-l="${esc(l.id)}"><i style="background:${safeColor(l.color)||"var(--ink-faint)"}"></i>${esc(l.name)}</button>`).join("")||'<span class="sub" style="font-size:13px;color:var(--ink-faint)">Non hai ancora liste: creane una qui sotto.</span>'}</div>
+      <div class="dump-newlist"><input id="dumpNewList" placeholder="Nuova lista, es. Spesa" aria-label="Nome della nuova lista"><button class="btn btn-quiet" id="dumpNewListGo">Crea</button></div></div>`:""}
+    <button class="rev-btn del" data-d="trash" style="width:100%;margin-top:8px">🗑 Butta<small>non serve più</small></button>
+    ${dump.stack.length?'<button class="dump-undo" id="dumpUndo">↩ Annulla l\'ultima</button>':""}`;
+  const next=(rec)=>{dump.stack.push(rec);dump.n[rec.k]++;dump.i++;dump.panel=null;save();renderAll();renderDump();};
+  const toList=l=>{const x={id:uid(),text:line,done:false};l.items.push(x);next({k:"list",listId:l.id,xid:x.id});};
+  const act={
+    task:()=>{const it=mkItem({title:p.title||line,task:true,date:p.date,time:p.time});if(p.repeat){setRepeat(it,p.repeat,p.repEvery);if(p.repDay)it.repDay=p.repDay;}S.items.unshift(it);next({k:"task",id:it.id});},
+    note:()=>{const it=mkItem({title:p.date?p.title:line,task:false,date:p.date,time:p.time});S.items.unshift(it);next({k:"note",id:it.id});},
+    inbox:()=>{const it=mkItem({title:line,task:true});S.items.unshift(it);next({k:"inbox",id:it.id});},
+    list:()=>{dump.panel=dump.panel==="list"?null:"list";renderDump();},
+    trash:()=>next({k:"trash"})
+  };
+  body.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>act[b.dataset.d]());
+  body.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{const l=S.lists.find(z=>z.id===b.dataset.l);if(l)toList(l);});
+  const ng=$("dumpNewListGo"); if(ng) ng.onclick=()=>{const v=$("dumpNewList").value.trim();if(!v){toast("Scrivi il nome della lista");return;}
+    const l={id:uid(),name:v,color:"",items:[],reset:"manual",lastReset:today()};S.lists.push(l);toList(l);};
+  const u=$("dumpUndo"); if(u) u.onclick=()=>{
+    const r=dump.stack.pop(); if(!r) return;
+    if(r.id){const k=S.items.findIndex(i=>i.id===r.id);if(k>=0)S.items.splice(k,1);}
+    if(r.listId){const l=S.lists.find(z=>z.id===r.listId);if(l)l.items=l.items.filter(x=>x.id!==r.xid);}
+    dump.n[r.k]--; dump.i--; dump.panel=null; save(); renderAll(); renderDump();
+  };
+}
+$("dumpOpen").onclick=openDump;
+
+// ===== Voce =====
+const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
+function micOk(){return !!SpeechRec;}
+let micRec=null, micBtn=null;
+function stopMic(){try{if(micRec)micRec.stop();}catch(e){} if(micBtn)micBtn.classList.remove("on"); micRec=null; micBtn=null;}
+function toggleMic(btn,onText,continuous){
+  if(micRec){stopMic();return;}
+  let rec; try{rec=new SpeechRec();}catch(e){toast("La voce non funziona su questo telefono");return;}
+  rec.lang="it-IT"; rec.interimResults=false; rec.continuous=!!continuous; rec.maxAlternatives=1;
+  rec.onresult=e=>{for(let k=e.resultIndex;k<e.results.length;k++){if(e.results[k].isFinal){const t=e.results[k][0].transcript;if(t&&t.trim())onText(t);}}};
+  rec.onerror=e=>{
+    const m={"not-allowed":"Permetti il microfono: tocca il lucchetto o le impostazioni dell'app e consenti il microfono","service-not-allowed":"Permetti il microfono nelle impostazioni dell'app","no-speech":"Non ho sentito niente. Riprova parlando vicino al telefono","network":"Per dettare serve internet","audio-capture":"Non trovo il microfono"}[e.error];
+    if(m) toast(m); stopMic();
+  };
+  rec.onend=()=>{if(micRec===rec)stopMic();};
+  try{rec.start();micRec=rec;micBtn=btn;btn.classList.add("on");if(navigator.vibrate)navigator.vibrate(15);}catch(e){toast("Non riesco ad accendere il microfono");stopMic();}
+}
+if(micOk()){
+  const cm=$("capMic"); cm.hidden=false;
+  cm.onclick=()=>toggleMic(cm,txt=>{const i=$("capInput");const v=i.value.trim();i.value=(v?v+" ":"")+txt.trim();i.dispatchEvent(new Event("input"));capGrow();},false);
+}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)stopMic();});
+
+// ===== Scorciatoie dall'icona (?azione=...) =====
+(function(){
+  let a=""; try{a=new URLSearchParams(location.search).get("azione")||"";}catch(e){}
+  if(!a) return;
+  try{history.replaceState(null,"",location.pathname);}catch(e){}
+  if(!S.onboarded) return;
+  setTimeout(()=>{
+    if(a==="appunto"||a==="dafare"){switchTab("oggi");setCapType(a==="appunto"?"note":"task");const i=$("capInput");i.scrollIntoView({block:"center"});i.focus();}
+    else if(a==="svuota"){switchTab("oggi");openDump();}
+    else if(a==="spesa"){const l=S.lists.find(x=>/spesa/i.test(x.name||""));switchTab("liste");if(l)openList(l.id);else toast("Crea una lista chiamata «Spesa» e la scorciatoia la aprirà");}
+  },350);
+})();
+
+// ===== La tua settimana: si apre da sola domenica sera e lunedì =====
+(function(){
+  if(!S.onboarded) return;
+  const off=bannerWeekOff(); if(off===null) return;
+  const now=new Date(); if(off===0&&now.getHours()<18) return;
+  const any=S.items.some(i=>i.done&&!i.ex)||S.habits.some(h=>h.hist.length);
+  if(!any||S.weekSeen===weekKey(off)) return;
+  if(new URLSearchParams(location.search).get("azione")) return;
+  setTimeout(()=>{if(!document.querySelector(".overlay.show"))openWeek(off);},700);
+})();
 // ===== Benvenuto =====
 (function(){
   const v=$("obView"), steps=[...v.querySelectorAll(".ob-step")], dots=[...$("obDots").children];

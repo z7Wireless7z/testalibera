@@ -28,5 +28,55 @@
    "type": "image/png",
    "purpose": "maskable"
   }
+ ],
+ "shortcuts": [
+  {
+   "name": "Nuova cosa da fare",
+   "short_name": "Da fare",
+   "url": "./?azione=dafare",
+   "icons": [
+    {
+     "src": "sc-dafare.png",
+     "sizes": "96x96",
+     "type": "image/png"
+    }
+   ]
+  },
+  {
+   "name": "Nuovo appunto",
+   "short_name": "Appunto",
+   "url": "./?azione=appunto",
+   "icons": [
+    {
+     "src": "sc-appunto.png",
+     "sizes": "96x96",
+     "type": "image/png"
+    }
+   ]
+  },
+  {
+   "name": "Svuota la testa",
+   "short_name": "Svuota",
+   "url": "./?azione=svuota",
+   "icons": [
+    {
+     "src": "sc-svuota.png",
+     "sizes": "96x96",
+     "type": "image/png"
+    }
+   ]
+  },
+  {
+   "name": "Spesa",
+   "short_name": "Spesa",
+   "url": "./?azione=spesa",
+   "icons": [
+    {
+     "src": "sc-spesa.png",
+     "sizes": "96x96",
+     "type": "image/png"
+    }
+   ]
+  }
  ]
 }
