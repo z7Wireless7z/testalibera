@@ -673,11 +673,21 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 .dump-sum b{display:block;font-family:var(--display);font-size:22px;color:var(--ink)}
 .dump-newlist{display:flex;gap:6px;margin-top:8px}
 .dump-newlist input{flex:1;min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:9px 11px;min-height:42px;color:var(--ink)}
+/* ===== Tasto Adesso nelle righe e risultato ===== */
+.now-btn{align-self:center;flex-shrink:0;background:var(--violet-soft);color:var(--ink);border:1px solid transparent;border-radius:99px;padding:6px 11px;font-family:var(--display);font-weight:600;font-size:12.5px;white-space:nowrap}
+.now-btn:active{transform:scale(.96)}
+.res-btns{display:flex;gap:8px}
+.res-btns .btn{flex:1}
+.res-btns .btn-primary{flex:2}
 /* ===== Microfono ===== */
 .mic-btn{width:44px;height:44px;flex-shrink:0;border-radius:12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-size:19px;display:inline-flex;align-items:center;justify-content:center}
 .mic-btn.on{background:var(--red);border-color:var(--red);color:#fff;animation:micPulse 1.2s ease-in-out infinite}
 @keyframes micPulse{50%{box-shadow:0 0 0 7px rgba(192,57,43,.18)}}
-.cap-foot .mic-btn{margin-left:auto;margin-right:6px}
+.cap-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.cap-top .cap-label{margin-bottom:0;flex:1;min-width:0}
+.cap-top .mic-btn{width:auto;height:34px;padding:0 11px;gap:5px;font-size:15px;border-radius:99px}
+.cap-top .mic-btn span{font-family:var(--display);font-size:12.5px;font-weight:600}
+body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 /* ===== Settimana: extra ===== */
 .wk-late{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .wk-late button.it{display:flex;justify-content:space-between;gap:10px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:9px 11px;color:var(--ink);font-size:14px}
@@ -763,12 +773,9 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
       <button class="wk-x" id="eveX" aria-label="Non oggi">×</button>
     </div>
 
-    <div class="sec"><h2>Adesso</h2><span class="hint">una cosa sola</span></div>
-    <div class="now" id="now"></div>
-
     <div class="sec"><h2>Cattura</h2><span class="count" id="inboxCount" hidden></span><span class="hint" id="capHintTxt">sistemi dopo</span><button class="rev-open" id="revOpen" hidden>Svuota la Cattura</button></div>
     <div class="capture">
-      <label class="cap-label" for="capInput">Cosa ti è venuto in mente?</label>
+      <div class="cap-top"><label class="cap-label" for="capInput">Cosa ti è venuto in mente?</label><button type="button" class="mic-btn" id="capMic" aria-label="Detta con la voce" title="Detta con la voce" hidden>🎤 <span>Detta</span></button></div>
       <textarea id="capInput" rows="3" placeholder="Scrivi qui. Esempio: domani alle 9 riunione cantiere" autocomplete="off" enterkeyhint="send"></textarea>
       <div class="cap-hint" id="capHint" hidden></div>
       <div class="cap-foot">
@@ -776,12 +783,14 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
           <button type="button" data-ct="note" aria-pressed="false">📝 Appunto</button>
           <button type="button" data-ct="task" aria-pressed="true">✓ Da fare</button>
         </div>
-        <button type="button" class="mic-btn" id="capMic" aria-label="Detta con la voce" title="Detta con la voce" hidden>🎤</button>
         <button class="cap-btn" id="capBtn">Cattura</button>
       </div>
     </div>
     <button class="dump-open" id="dumpOpen"><span class="ico">🧠</span><span><b>Svuota la testa</b><small>Hai tanti pensieri? Scrivili tutti di getto, poi li smisti.</small></span></button>
     <div class="list" id="inboxList" style="margin-top:10px"></div>
+
+    <div class="sec"><h2>Adesso</h2><span class="hint">una cosa sola</span></div>
+    <div class="now" id="now"></div>
 
     <div class="sec"><h2>In programma oggi</h2><span class="count" id="agendaCount" hidden></span></div>
     <div id="agenda"></div>
@@ -799,7 +808,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 35 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 36 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1056,6 +1065,24 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
   </div>
 </div>
 
+<!-- Risultato dopo aver spuntato -->
+<div class="overlay" id="resSheet">
+  <div class="sheet" role="dialog" aria-label="Risultato">
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0"><div class="sheet-title">Fatto! Com'è andata?</div><div class="sheet-sub" id="resWhat"></div></div>
+      <button class="sheet-close" id="resX" aria-label="Chiudi">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div class="res-box" style="margin:0">
+        <label class="ed-label" for="resText">Risultato <span>facoltativo</span></label>
+        <textarea class="ed-body ed-res" id="resText" rows="3" placeholder="Es. oggi ho fatto petto · arrivati 1.450 € · deciso di partire lunedì"></textarea>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-faint);margin:8px 2px 14px">Lo ritrovi nel Calendario, nei Completati e nella tua settimana.</p>
+      <div class="res-btns"><button class="btn btn-quiet" id="resSkip">Salta</button><button class="btn btn-primary" id="resSave">Salva risultato</button></div>
+    </div>
+  </div>
+</div>
+
 <!-- Svuota la testa -->
 <div class="overlay" id="dumpSheet">
   <div class="sheet" role="dialog" aria-label="Svuota la testa">
@@ -1182,7 +1209,8 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
           <h5>Adesso</h5>
           <p>È il riquadro grande. Contiene <b>una sola cosa</b>: quella su cui stai lavorando. Tutto il resto lo ignori finché non hai finito. Quando è vuoto c'è il bottone <b>"Non so da dove partire: scegli tu"</b>, che ti propone cosa fare.</p>
           <ul>
-            <li><b>Per metterci qualcosa</b>: apri una cosa da fare e tocca "Metti in Adesso".</li>
+            <li><b>Per metterci qualcosa</b>: tocca il tasto <b>Adesso</b> che trovi a destra di ogni cosa da fare o appunto. Oppure apri la cosa e tocca "Metti in Adesso". Un appunto messo in Adesso diventa una cosa da fare.</li>
+            <li>Il riquadro Adesso sta <b>sotto la Cattura</b> e "Svuota la testa".</li>
             <li>Se hai scritto un <b>primo passo</b>, vedi quello in grande, perché è più facile iniziare da lì.</li>
             <li>Se la cosa ha dei <b>pezzi</b>, vedi solo il prossimo pezzo e il bottone <b>"Pezzo fatto ✓"</b>.</li>
             <li><b>Timer (se vuoi)</b>: all'inizio non c'è. Se ti serve, tocca <b>"⏱ Usa il timer"</b>, scegli la durata (15, 25, 45, 60 minuti o quella che vuoi tu) e tocca "Avvia". Puoi mettere in pausa, riprendere o azzerare. Se non ti serve più, tocca <b>"Togli il timer"</b>.</li>
@@ -1413,7 +1441,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
       <details class="hsec" id="h-voce">
         <summary><span class="hico">🎤</span><span class="htitle">Dettare con la voce<small>scrivi parlando</small></span><span class="hchev">›</span></summary>
         <div class="hbody">
-          <p>Accanto al tasto <b>Cattura</b> c'è il microfono 🎤. Toccalo e parla: per esempio "domani alle 9 chiamare Marco". Il testo compare nella casella e l'app capisce già giorno e ora. Poi tocca <b>Cattura</b>.</p>
+          <p>In alto a destra nel riquadro della <b>Cattura</b> c'è il tasto <b>🎤 Detta</b>. Toccalo e parla: per esempio "domani alle 9 chiamare Marco". Il testo compare nella casella e l'app capisce già giorno e ora. Poi tocca <b>Cattura</b>.</p>
           <ul>
             <li>Mentre ascolta, il microfono diventa <b>rosso</b>. Toccalo di nuovo per fermarlo.</li>
             <li>La prima volta il telefono ti chiede il permesso di usare il microfono: rispondi <b>"Consenti"</b>.</li>
@@ -1488,7 +1516,8 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
       <details class="hsec" id="h-res">
         <summary><span class="hico">✎</span><span class="htitle">Risultato<small>scrivi com'è andata e ritrovalo nel calendario</small></span><span class="hchev">›</span></summary>
         <div class="hbody">
-          <p>Ogni cosa da fare ha una sezione verde chiamata <b>Risultato</b>. Ci scrivi <b>com'è andata</b>, prima o dopo averla spuntata.</p>
+          <p>Ogni cosa da fare ha una sezione verde chiamata <b>Risultato</b>. Ci scrivi <b>com'è andata</b>.</p>
+          <p><b>Appena spunti una cosa</b>, si apre da sola la pagina "Fatto! Com'è andata?": scrivi il risultato e tocca <b>Salva risultato</b>, oppure tocca <b>Salta</b> se non serve. Puoi sempre aggiungerlo o cambiarlo dopo, aprendo la cosa.</p>
           <h5>Esempi</h5>
           <ul>
             <li>Palestra → Risultato: <b>"oggi ho fatto petto"</b></li>
@@ -1740,7 +1769,7 @@ footer .quote{font-size:13px;color:var(--ink-soft);font-style:italic;max-width:3
         <div class="status" id="stStatus"><i></i><span></span></div>
         <p id="stLast" style="margin:8px 0 0"></p>
         <p id="stProt" style="margin:6px 0 0;font-size:13px" hidden></p>
-        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 35</p>
+        <p style="margin:6px 0 0;font-size:12px;color:var(--ink-faint)">Versione 36</p>
       </div>
       <div class="card">
         <h4>Aspetto</h4>
@@ -2036,7 +2065,7 @@ function closeConfirm(){$("confirmOv").classList.remove("show");confirmCb=null;}
 const openSheets=[];
 function openSheet(id){$(id).classList.add("show");if(!openSheets.includes(id))openSheets.push(id);$(id).style.zIndex=60+openSheets.indexOf(id);document.body.style.overflow="hidden";document.body.classList.add("sheet-open");}
 function closeSheet(id){
-  $(id).classList.remove("show");const i=openSheets.indexOf(id);if(i>-1)openSheets.splice(i,1);
+  $(id).classList.remove("show");if(id==="resSheet")document.body.classList.remove("res-open");const i=openSheets.indexOf(id);if(i>-1)openSheets.splice(i,1);
   if(!openSheets.length){document.body.style.overflow="";document.body.classList.remove("sheet-open");}
   if(id==="edSheet") onEditorClosed();
   if(id==="revSheet"||id==="listSheet"||id==="dcSheet"||id==="timeSheet") renderAll();
@@ -2072,8 +2101,10 @@ function itemRow(it,opt){
     ?`<button class="chk${it.done?" on":""}" data-a="chk" aria-label="${it.done?"Segna come da fare":"Segna come fatto"}">${it.done?"✓":""}</button>`
     :`<span class="note-ico">${NOTE_SVG}</span>`;
   const c=safeColor(it.color);
-  row.innerHTML=`${left}<button class="row-main" data-a="open"><div class="row-title">${c?`<span class="cdot" style="background:${c}"></span>`:""}${esc(title)}</div>${prev?`<div class="row-prev">${esc(prev)}</div>`:""}${it.result&&!opt.virtual?`<div class="row-res"><b>Risultato</b>${esc(it.result)}</div>`:""}${meta.length?`<div class="row-meta">${meta.join("")}</div>`:""}</button>${it.pinned&&opt.showPin!==false?PIN_SVG:""}`;
+  row.innerHTML=`${left}<button class="row-main" data-a="open"><div class="row-title">${c?`<span class="cdot" style="background:${c}"></span>`:""}${esc(title)}</div>${prev?`<div class="row-prev">${esc(prev)}</div>`:""}${it.result&&!opt.virtual?`<div class="row-res"><b>Risultato</b>${esc(it.result)}</div>`:""}${meta.length?`<div class="row-meta">${meta.join("")}</div>`:""}</button>${it.pinned&&opt.showPin!==false?PIN_SVG:""}${!it.done&&!opt.virtual&&it.id!==S.focusId?'<button class="now-btn" data-a="now" aria-label="Metti in Adesso">Adesso</button>':""}`;
   row.querySelector('[data-a="open"]').onclick=()=>openEditor(it.id);
+  const nb=row.querySelector('[data-a="now"]');
+  if(nb) nb.onclick=e=>{e.stopPropagation(); setFocus(it.id);};
   const ck=row.querySelector('[data-a="chk"]');
   if(ck) ck.onclick=e=>{e.stopPropagation(); if(it.done) undone(it); else markDone(it);};
   if(opt.snooze){
@@ -2124,32 +2155,51 @@ function habSched(h,ds){
   const start=ymd(new Date(h.linkedAt||t.createdAt||Date.now()));
   return ds>=start&&isOcc(t,ds);
 }
+let lastCopy=null;
 function completeRepeat(it,habDate){
   const snap=JSON.stringify(it), occ=it.date, t=today();
   const h=habitOf(it), hd=habDate||(occ<=t?occ:""); let added=null;
   if(h&&hd&&!h.hist.includes(hd)){h.hist.push(hd);added=hd;}
   const copy=mkItem(Object.assign(JSON.parse(snap),{id:uid(),repeat:"",done:true,completedAt:nowIso(),pinned:false,fromId:it.id,occDate:occ,habDate:h?hd:""}));
+  lastCopy=copy;
   it.date=nextOcc(it); it.subs.forEach(x=>x.done=false); it.body=resetChecks(it.body); it.result=""; touch(it);
   if(it.id===S.focusId){S.focusId=null;resetTimer();}
   S.items.push(copy);
   return ()=>{const o=JSON.parse(snap);Object.keys(o).forEach(k=>it[k]=o[k]);S.items=S.items.filter(x=>x.id!==copy.id);if(h&&added)h.hist=h.hist.filter(x=>x!==added);};
 }
-function markDone(it,sure){
+function markDone(it,sure,quiet){
   if(it.repeat&&it.task&&it.date){
     if(it.date>today()&&!sure){
-      askConfirm(`«${it.title||"Questa cosa"}» è prevista per ${dayLabel(it.date,true)}.\n\nVuoi segnarla come già fatta adesso?`,()=>markDone(it,true),"Sì, è fatta");
+      askConfirm(`«${it.title||"Questa cosa"}» è prevista per ${dayLabel(it.date,true)}.\n\nVuoi segnarla come già fatta adesso?`,()=>markDone(it,true,quiet),"Sì, è fatta");
       return;
     }
     const h=habitOf(it), early=it.date>today(), undo=completeRepeat(it);
     save(); renderAll(); if(navigator.vibrate)navigator.vibrate(30);
-    toast("Fatto"+(h&&!early?", spuntata anche l'abitudine":"")+". Torna "+dayLabel(it.date).toLowerCase(),"Annulla",()=>{undo();save();renderAll();});
+    toast("Fatto"+(h&&!early?", spuntata anche l'abitudine":"")+". Torna "+dayLabel(it.date).toLowerCase(),"Annulla",()=>{undo();save();renderAll();closeRes();});
+    if(!quiet&&lastCopy) askResult(lastCopy);
     return;
   }
   it.done=true; it.completedAt=nowIso(); touch(it);
   if(it.id===S.focusId){S.focusId=null;resetTimer();}
   save(); renderAll(); if(navigator.vibrate)navigator.vibrate(30);
-  toast("Spostato nei Completati","Annulla",()=>{it.done=false;it.completedAt=null;save();renderAll();});
+  toast("Spostato nei Completati","Annulla",()=>{it.done=false;it.completedAt=null;save();renderAll();closeRes();});
+  if(!quiet) askResult(it);
 }
+// ---------- risultato subito dopo aver spuntato ----------
+let resItem=null;
+function askResult(it){
+  if(!it) return; resItem=it;
+  $("resWhat").textContent=it.title||firstLine(it.body)||"(senza titolo)";
+  const ta=$("resText"); ta.value=it.result||"";
+  setTimeout(()=>{openSheet("resSheet");document.body.classList.add("res-open");setTimeout(()=>ta.focus(),250);},120);
+}
+function saveResult(){
+  const it=resItem; if(!it){closeSheet("resSheet");return;}
+  const v=$("resText").value.trim();
+  if(v!==(it.result||"")){it.result=v;touch(it);save();renderAll();if(v)toast("Risultato salvato ✓");}
+  closeRes();
+}
+function closeRes(){resItem=null;closeSheet("resSheet");document.body.classList.remove("res-open");}
 function revertOcc(c){
   const parent=c.fromId?S.items.find(i=>i.id===c.fromId):null;
   S.items=S.items.filter(x=>x!==c);
@@ -2204,7 +2254,7 @@ function renderNow(){
   el.classList.toggle("running",!!S.timer.running);
   if(!t){
     const nCand=pickCandidates().length;
-    el.innerHTML=`<div class="now-empty"><div class="big">Niente in Adesso</div><p>Una testa libera fa una cosa alla volta. Apri una cosa da fare e tocca "Metti in Adesso".</p>
+    el.innerHTML=`<div class="now-empty"><div class="big">Niente in Adesso</div><p>Una testa libera fa una cosa alla volta. Tocca il tasto <b>Adesso</b> accanto a una cosa da fare.</p>
       <div class="now-pick">${nCand?`<button class="btn btn-violet" id="pickBtn">Non so da dove partire: scegli tu</button>`:""}<button class="btn btn-ghost" id="timeBtn">⏱ Ho poco tempo</button></div></div>`;
     if(nCand) $("pickBtn").onclick=openPick;
     $("timeBtn").onclick=()=>openTime();
@@ -3049,7 +3099,7 @@ function renderDayClose(){
       </div>
       ${it.repeat?"":`<button class="rev-skip" data-d="keep">Lascia così</button>`}`;
     const act={
-      done:()=>{markDone(it,true);dc.done++;},
+      done:()=>{markDone(it,true,true);dc.done++;},
       tom:()=>{it.date=tom;touch(it);dc.moved++;},
       mon:()=>{it.date=mon;touch(it);dc.moved++;},
       week:()=>{it.date=ymd(addDays(base,7));touch(it);dc.moved++;},
@@ -3689,6 +3739,10 @@ function renderDump(){
   };
 }
 $("dumpOpen").onclick=openDump;
+$("resSave").onclick=saveResult;
+$("resSkip").onclick=closeRes;
+$("resX").onclick=closeRes;
+$("resSheet").addEventListener("click",e=>{if(e.target.id==="resSheet")closeRes();});
 
 // ===== Voce =====
 const SpeechRec=window.SpeechRecognition||window.webkitSpeechRecognition;
