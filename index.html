@@ -346,6 +346,7 @@ button{cursor:pointer}
 .qd-next .qd-big{font-size:40px}
 .qd-link{display:inline-block;margin:10px 0 0;background:none;border:none;color:var(--violet);font-size:13px;font-weight:500;padding:4px 8px}
 .qd-adds{display:flex;gap:8px;margin-top:10px}
+.cal-mode{margin-top:20px}
 .qd-adds .day-add{margin-top:0;flex:1}
 .qd-notes{margin-top:18px}
 .qd-notes-h{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink-soft);margin:0 0 8px;background:var(--surface)}
@@ -867,7 +868,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 40 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 41 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -911,9 +912,16 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
     </div>
     <div class="cal-dow"><span>Lun</span><span>Mar</span><span>Mer</span><span>Gio</span><span>Ven</span><span>Sab</span><span>Dom</span></div>
     <div class="cal-grid" id="calGrid"></div>
-    <div class="day-head"><h3 id="dayTitle"></h3><span class="sheet-sub" id="dayCount"></span></div>
-    <div class="list" id="dayList"></div>
-    <button class="day-add" id="dayAdd">+ Aggiungi in questo giorno</button>
+    <div class="seg-ctl qd-mode cal-mode" role="group" aria-label="Come vedere la giornata">
+      <button type="button" data-m="check" aria-pressed="true">☑ Checklist</button>
+      <button type="button" data-m="path" aria-pressed="false">⛳ Tappe</button>
+      <button type="button" data-m="next" aria-pressed="false">➜ Prossimo</button>
+    </div>
+    <div class="qd-book"><div class="qd-page" id="calPage"></div></div>
+    <div class="qd-adds">
+      <button class="day-add" id="dayAdd">+ Impegno</button>
+      <button class="day-add" id="calNote">✎ Annotazione</button>
+    </div>
   </section>
 
   <!-- ABITUDINI -->
@@ -1358,6 +1366,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>Tre modi di vedere la pagina</b>: <b>Checklist</b> (tutto l'elenco da spuntare), <b>Tappe</b> (un percorso: finisci una tappa e si sblocca la successiva), <b>Prossimo</b> (vedi solo la prossima cosa da fare).</li>
             <li>La <b>barra</b> ti dice quante cose hai fatto su quante ne avevi, in tutti e tre i modi.</li>
             <li><b>+ Impegno</b> apre la scheda completa. <b>✎ Annotazione</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
+            <li>La stessa pagina la vedi anche nel <b>Calendario</b>, quando tocchi un giorno.</li>
             <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche nel quaderno.</li>
           </ul>
         </div>
@@ -2812,13 +2821,8 @@ function renderCal(){
     b.onclick=()=>{calSel=ds;if(d.getMonth()!==calCursor.getMonth()){calCursor=new Date(d.getFullYear(),d.getMonth(),1);}renderCal();};
     g.appendChild(b);
   }
-  const its=(map[calSel]||[]).sort(byTime), vits=(vmap[calSel]||[]).slice().sort((a,b)=>(a.time||"").localeCompare(b.time||""));
-  const tot=its.length+vits.length;
-  $("dayTitle").textContent=dayLabel(calSel,true);
-  $("dayCount").textContent=tot?tot+(tot===1?" elemento":" elementi"):"";
-  const box=$("dayList");
-  fillList(box,its,vits.length?null:"Niente in questo giorno.",{showDate:false});
-  vits.forEach(i=>box.appendChild(itemRow(i,{virtual:true})));
+  qdModeSync();
+  const box=$("calPage"); renderDayPage(box,calSel);
   const habs=S.habits.filter(h=>h.hist.includes(calSel));
   if(habs.length){
     const hd=document.createElement("div"); hd.className="day-habs";
@@ -3702,13 +3706,17 @@ function qdEntries(ds){
   const virt=S.items.filter(i=>i.task&&occurrences(i,ds,ds).length).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
   return real.map(it=>({it,done:!!it.done,virt:false})).concat(virt.map(it=>({it,done:false,virt:true})));
 }
+function qdModeSync(){const m=qdMode();document.querySelectorAll(".qd-mode button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===m)));}
 function renderQuad(){
-  const mode=qdMode(), t=today();
-  document.querySelectorAll("#qdMode button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===mode)));
-  $("qdToday").textContent=qdSel===t?"Oggi":"Torna a oggi";
-  const pg=$("qdPage"), d=parseYmd(qdSel), f=feastOf(d), red=d.getDay()===0||(f&&f.hol);
-  const rel=qdSel===t?"Oggi":qdSel===ymd(addDays(new Date(),1))?"Domani":qdSel===ymd(addDays(new Date(),-1))?"Ieri":"";
-  const ents=qdEntries(qdSel), n=ents.length, dn=ents.filter(e=>e.done).length, pct=n?Math.round(dn*100/n):0;
+  qdModeSync();
+  $("qdToday").textContent=qdSel===today()?"Oggi":"Torna a oggi";
+  renderDayPage($("qdPage"),qdSel);
+}
+// la pagina di un giorno: la usano la sezione con la freccia e il Calendario
+function renderDayPage(pg,ds){
+  const mode=qdMode(), t=today(), d=parseYmd(ds), f=feastOf(d), red=d.getDay()===0||(f&&f.hol);
+  const rel=ds===t?"Oggi":ds===ymd(addDays(new Date(),1))?"Domani":ds===ymd(addDays(new Date(),-1))?"Ieri":"";
+  const ents=qdEntries(ds), n=ents.length, dn=ents.filter(e=>e.done).length, pct=n?Math.round(dn*100/n):0;
   pg.innerHTML=`<div class="qd-head"><div class="qd-num${red?" red":""}">${d.getDate()}</div><div class="qd-hd"><div class="qd-dow${red?" red":""}">${DAYS[d.getDay()]}</div><div class="qd-mon">${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>${f?`<span class="qd-feast${f.hol?" hol":""}">${esc(f.n)}</span>`:""}</div>${rel?`<span class="qd-rel">${rel}</span>`:""}</div>`
     +`<div class="qd-prog"><div class="qd-bar" role="progressbar" aria-label="Cose fatte" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${dn}"><i style="width:${pct}%"></i></div><span>${n?dn+" su "+n:"niente in programma"}</span></div>`;
   const box=document.createElement("div"); pg.appendChild(box);
@@ -3716,7 +3724,7 @@ function renderQuad(){
   else if(mode==="path") qdPath(box,ents); else if(mode==="next") qdNextView(box,ents);
   else { box.className="list"; ents.forEach(e=>box.appendChild(itemRow(e.it,e.virt?{virtual:true}:{showDate:false}))); }
   // annotazioni del giorno: solo testo, non contano nella barra
-  const notes=S.items.filter(i=>!i.task&&i.date===qdSel).sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||""));
+  const notes=S.items.filter(i=>!i.task&&i.date===ds).sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||""));
   if(notes.length){
     const nb=document.createElement("div"); nb.className="qd-notes";
     nb.innerHTML=`<div class="qd-notes-h">✎ Annotazioni</div>`;
@@ -3731,8 +3739,8 @@ function renderQuad(){
 }
 // ---------- annotazione: una pagina dove si scrive e basta ----------
 let qnItem=null, qnDate="";
-function qnOpen(it){
-  qnItem=it||null; qnDate=it?it.date:qdSel;
+function qnOpen(it,ds){
+  qnItem=it||null; qnDate=it?it.date:(ds||qdSel);
   $("qnText").value=it?it.body:"";
   const w=dayLabel(qnDate,true); $("qnWhen").textContent=w.charAt(0).toUpperCase()+w.slice(1);
   $("qnDel").hidden=!it;
@@ -3897,12 +3905,13 @@ $("apSearch").addEventListener("input",e=>{apQuery=e.target.value;renderAppunti(
 $("calPrev").onclick=()=>calMove(-1); $("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{calCursor=new Date();calCursor.setDate(1);calSel=today();renderCal();};
 $("dayAdd").onclick=()=>newItem({task:true,date:calSel});
-document.querySelectorAll("#qdMode button").forEach(b=>b.onclick=()=>{S.qdMode=b.dataset.m;save();renderQuad();});
+document.querySelectorAll(".qd-mode button").forEach(b=>b.onclick=()=>{S.qdMode=b.dataset.m;save();renderView();});
 $("qdPrev").onclick=()=>qdStep(-1);
 $("qdNext").onclick=()=>qdStep(1);
 $("qdToday").onclick=()=>qdGo(today());
 $("qdAdd").onclick=()=>newItem({task:true,date:qdSel});
-$("qdNote").onclick=()=>qnOpen(null);
+$("qdNote").onclick=()=>qnOpen(null,qdSel);
+$("calNote").onclick=()=>qnOpen(null,calSel);
 $("qnSave").onclick=$("qnX").onclick=()=>closeSheet("qnSheet");
 $("qnDel").onclick=()=>{$("qnText").value="";closeSheet("qnSheet");};
 (function(){const bk=$("qdBook");let sx=null,sy=0;
