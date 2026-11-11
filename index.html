@@ -345,6 +345,12 @@ button{cursor:pointer}
 .qd-next .btn{width:100%;max-width:260px}
 .qd-next .qd-big{font-size:40px}
 .qd-link{display:inline-block;margin:10px 0 0;background:none;border:none;color:var(--violet);font-size:13px;font-weight:500;padding:4px 8px}
+.qd-adds{display:flex;gap:8px;margin-top:10px}
+.qd-adds .day-add{margin-top:0;flex:1}
+.qd-notes{margin-top:18px}
+.qd-notes-h{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink-soft);margin:0 0 8px;background:var(--surface)}
+.qd-note{display:block;width:100%;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;background:var(--gold-soft);border:1px solid var(--gold-line);color:var(--ink);border-radius:12px;padding:10px 12px;font:inherit;font-size:14.5px;line-height:1.5;margin-bottom:8px;max-height:9.6em;overflow:hidden}
+.ed-body.qn-text{min-height:240px}
 .qd-next .qd-left{margin:12px 0 0;font-size:12.5px;color:var(--ink-faint)}
 .fab{position:fixed;right:max(16px, calc((100vw - 560px) / 2 + 16px));bottom:calc(80px + env(safe-area-inset-bottom, 0px));width:56px;height:56px;border-radius:18px;border:none;background:var(--violet);color:var(--on-accent);font-size:28px;line-height:1;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:41;display:flex;align-items:center;justify-content:center}
 
@@ -861,7 +867,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 39 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 40 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -878,7 +884,10 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
       <button class="cal-nav" id="qdNext" aria-label="Giorno dopo">›</button>
     </div>
     <div class="qd-book" id="qdBook"><div class="qd-page" id="qdPage"></div></div>
-    <button class="day-add" id="qdAdd">+ Aggiungi in questo giorno</button>
+    <div class="qd-adds">
+      <button class="day-add" id="qdAdd">+ Impegno</button>
+      <button class="day-add" id="qdNote">✎ Annotazione</button>
+    </div>
   </section>
 
   <!-- APPUNTI -->
@@ -1136,6 +1145,18 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 </div>
 
 <!-- Risultato dopo aver spuntato -->
+<div class="overlay" id="qnSheet">
+  <div class="sheet" role="dialog" aria-label="Annotazione">
+    <div class="sheet-head">
+      <div style="flex:1;min-width:0"><div class="sheet-title">Annotazione</div><div class="sheet-sub" id="qnWhen"></div></div>
+      <button class="sheet-close" id="qnX" aria-label="Salva e chiudi">✕</button>
+    </div>
+    <div class="sheet-body">
+      <textarea class="ed-body qn-text" id="qnText" placeholder="Scrivi qui…" aria-label="Testo dell'annotazione"></textarea>
+      <div class="res-btns" style="margin-top:14px"><button class="btn btn-danger" id="qnDel" hidden>Elimina</button><button class="btn btn-primary" id="qnSave">Salva</button></div>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="resSheet">
   <div class="sheet" role="dialog" aria-label="Risultato">
     <div class="sheet-head">
@@ -1336,6 +1357,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>In alto</b> vedi la data, il giorno e l'eventuale festa.</li>
             <li><b>Tre modi di vedere la pagina</b>: <b>Checklist</b> (tutto l'elenco da spuntare), <b>Tappe</b> (un percorso: finisci una tappa e si sblocca la successiva), <b>Prossimo</b> (vedi solo la prossima cosa da fare).</li>
             <li>La <b>barra</b> ti dice quante cose hai fatto su quante ne avevi, in tutti e tre i modi.</li>
+            <li><b>+ Impegno</b> apre la scheda completa. <b>✎ Annotazione</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
             <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche nel quaderno.</li>
           </ul>
         </div>
@@ -2271,6 +2293,7 @@ function closeSheet(id){
   $(id).classList.remove("show");if(id==="resSheet")document.body.classList.remove("res-open");const i=openSheets.indexOf(id);if(i>-1)openSheets.splice(i,1);
   if(!openSheets.length){document.body.style.overflow="";document.body.classList.remove("sheet-open");}
   if(id==="edSheet") onEditorClosed();
+  if(id==="qnSheet") qnCommit();
   if(id==="revSheet"||id==="listSheet"||id==="dcSheet"||id==="timeSheet") renderAll();
 }
 function swatchHTML(cur){
@@ -3689,9 +3712,39 @@ function renderQuad(){
   pg.innerHTML=`<div class="qd-head"><div class="qd-num${red?" red":""}">${d.getDate()}</div><div class="qd-hd"><div class="qd-dow${red?" red":""}">${DAYS[d.getDay()]}</div><div class="qd-mon">${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>${f?`<span class="qd-feast${f.hol?" hol":""}">${esc(f.n)}</span>`:""}</div>${rel?`<span class="qd-rel">${rel}</span>`:""}</div>`
     +`<div class="qd-prog"><div class="qd-bar" role="progressbar" aria-label="Cose fatte" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${dn}"><i style="width:${pct}%"></i></div><span>${n?dn+" su "+n:"niente in programma"}</span></div>`;
   const box=document.createElement("div"); pg.appendChild(box);
-  if(!n){box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca «+ Aggiungi in questo giorno» qui sotto.</div>`;return;}
-  if(mode==="path") qdPath(box,ents); else if(mode==="next") qdNextView(box,ents);
+  if(!n) box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca «+ Impegno» qui sotto.</div>`;
+  else if(mode==="path") qdPath(box,ents); else if(mode==="next") qdNextView(box,ents);
   else { box.className="list"; ents.forEach(e=>box.appendChild(itemRow(e.it,e.virt?{virtual:true}:{showDate:false}))); }
+  // annotazioni del giorno: solo testo, non contano nella barra
+  const notes=S.items.filter(i=>!i.task&&i.date===qdSel).sort((a,b)=>(a.createdAt||"").localeCompare(b.createdAt||""));
+  if(notes.length){
+    const nb=document.createElement("div"); nb.className="qd-notes";
+    nb.innerHTML=`<div class="qd-notes-h">✎ Annotazioni</div>`;
+    notes.forEach(it=>{
+      const b=document.createElement("button"); b.className="qd-note";
+      b.textContent=it.qn?it.body:[it.title,it.body].filter(Boolean).join("\n");
+      b.onclick=()=>it.qn?qnOpen(it):openEditor(it.id);
+      nb.appendChild(b);
+    });
+    pg.appendChild(nb);
+  }
+}
+// ---------- annotazione: una pagina dove si scrive e basta ----------
+let qnItem=null, qnDate="";
+function qnOpen(it){
+  qnItem=it||null; qnDate=it?it.date:qdSel;
+  $("qnText").value=it?it.body:"";
+  const w=dayLabel(qnDate,true); $("qnWhen").textContent=w.charAt(0).toUpperCase()+w.slice(1);
+  $("qnDel").hidden=!it;
+  openSheet("qnSheet"); setTimeout(()=>$("qnText").focus(),250);
+}
+function qnCommit(){
+  const v=$("qnText").value.replace(/\s+$/,""), it=qnItem; qnItem=null;
+  if(it){
+    if(!v.trim()){S.items=S.items.filter(x=>x!==it);save();renderAll();toast("Annotazione eliminata","Annulla",()=>{S.items.unshift(it);save();renderAll();});return;}
+    if(v!==it.body){it.body=v;touch(it);}
+  } else if(v.trim()) S.items.unshift(mkItem({body:v,task:false,date:qnDate,qn:true}));
+  save(); renderAll();
 }
 function qdPath(box,ents){
   const cur=ents.findIndex(e=>!e.done), left=ents.filter(e=>!e.done).length;
@@ -3849,6 +3902,9 @@ $("qdPrev").onclick=()=>qdStep(-1);
 $("qdNext").onclick=()=>qdStep(1);
 $("qdToday").onclick=()=>qdGo(today());
 $("qdAdd").onclick=()=>newItem({task:true,date:qdSel});
+$("qdNote").onclick=()=>qnOpen(null);
+$("qnSave").onclick=$("qnX").onclick=()=>closeSheet("qnSheet");
+$("qnDel").onclick=()=>{$("qnText").value="";closeSheet("qnSheet");};
 (function(){const bk=$("qdBook");let sx=null,sy=0;
   bk.addEventListener("touchstart",e=>{if(e.touches.length!==1){sx=null;return;}sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
   bk.addEventListener("touchend",e=>{if(sx==null)return;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;sx=null;
