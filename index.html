@@ -345,18 +345,14 @@ button{cursor:pointer}
 .qd-next .btn{width:100%;max-width:260px}
 .qd-next .qd-big{font-size:40px}
 .qd-link{display:inline-block;margin:10px 0 0;background:none;border:none;color:var(--violet);font-size:13px;font-weight:500;padding:4px 8px}
-.fab{transition:transform .2s ease}
-.fab.open{transform:rotate(45deg)}
-.fab-menu{position:fixed;right:max(16px, calc((100vw - 560px) / 2 + 16px));bottom:calc(146px + env(safe-area-inset-bottom, 0px));z-index:42;display:flex;flex-direction:column;align-items:flex-end;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--shadow-md);animation:fmIn .16s ease-out;transform-origin:bottom right}
+.fab-menu{position:fixed;right:max(16px, calc((100vw - 560px) / 2 + 16px));bottom:calc(80px + env(safe-area-inset-bottom, 0px));z-index:41;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 .fab-menu[hidden]{display:none}
-.fab-menu::after{content:"";position:absolute;right:22px;bottom:-7px;width:12px;height:12px;background:var(--surface);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
-.fab-menu button{display:inline-flex;align-items:center;gap:6px;width:auto;border:none;background:transparent;border-radius:10px;padding:8px 12px;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink);white-space:nowrap}
-.fab-menu button:active,.fab-menu button:hover{background:var(--sunk)}
+.fab-menu button{display:inline-flex;align-items:center;gap:7px;width:auto;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px 9px 10px;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink);white-space:nowrap;box-shadow:var(--shadow-md)}
+.fab-menu button:active{background:var(--sunk)}
 .fab-menu i{font-style:normal;font-size:12px;font-weight:700;line-height:1;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--violet);color:var(--on-accent)}
-@keyframes fmIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
-@media (prefers-reduced-motion: reduce){.fab,.fab-menu{transition:none;animation:none}}
 .qd-adds{display:flex;gap:8px;margin-top:10px}
 .cal-mode{margin-top:20px}
+#v-cal{padding-bottom:90px}
 .qd-adds .day-add{margin-top:0;flex:1}
 .qd-notes{margin-top:18px}
 .qd-notes-h{font-family:var(--display);font-size:13px;font-weight:700;color:var(--ink-soft);margin:0 0 8px;background:var(--surface)}
@@ -846,12 +842,12 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
     <div class="sec"><h2>Cattura</h2><span class="count" id="inboxCount" hidden></span><span class="hint" id="capHintTxt">sistemi dopo</span><button class="rev-open" id="revOpen" hidden>Svuota la Cattura</button></div>
     <div class="capture">
       <div class="cap-top"><label class="cap-label" for="capInput">Cosa ti è venuto in mente?</label><button type="button" class="mic-btn" id="capMic" aria-label="Detta con la voce" title="Detta con la voce" hidden>🎤 <span>Detta</span></button></div>
-      <textarea id="capInput" rows="3" placeholder="Scrivi qui. Esempio: domani alle 9 riunione cantiere" autocomplete="off" enterkeyhint="send"></textarea>
+      <textarea id="capInput" rows="3" placeholder="Scrivi qui. Esempio: domani alle 9 riunione cantiere" autocomplete="off" enterkeyhint="enter"></textarea>
       <div class="cap-hint" id="capHint" hidden></div>
       <div class="cap-foot">
         <div class="cap-type" role="group" aria-label="Cosa stai scrivendo?">
-          <button type="button" data-ct="note" aria-pressed="false">📝 Appunto</button>
-          <button type="button" data-ct="task" aria-pressed="true">✓ Da fare</button>
+          <button type="button" data-ct="task" aria-pressed="true">✓ Impegno</button>
+          <button type="button" data-ct="note" aria-pressed="false">📝 Annota</button>
         </div>
         <button class="cap-btn" id="capBtn">Cattura</button>
       </div>
@@ -878,7 +874,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 43 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 44 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -953,6 +949,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 <div class="overlay" id="edSheet">
   <div class="sheet" role="dialog" aria-label="Modifica">
     <div class="sheet-head">
+      <div class="sheet-title" id="edKind" style="flex:1" hidden>Impegno</div>
       <div class="seg-ctl" id="edType" style="flex:1;max-width:280px">
         <button data-type="note" aria-pressed="false">Appunto</button>
         <button data-type="task" aria-pressed="false">Da fare</button>
@@ -1310,15 +1307,15 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>cambia ›</b>: toglie la cosa da Adesso senza completarla.</li>
           </ul>
           <h5>Cattura</h5>
-          <p>Sotto il riquadro dove scrivi ci sono due bottoni: <b>📝 Appunto</b> e <b>✓ Da fare</b>. Scegli cosa stai scrivendo e poi tocca <b>Cattura</b>: la cosa finisce già nel posto giusto. L'app si ricorda l'ultima scelta che hai fatto.</p>
-          <p>Il posto dove <b>butti dentro tutto al volo</b>: un'idea, una cosa da ricordare, un impegno. Scrivi e premi invio, senza pensare a dove metterlo.</p>
+          <p>Sotto il riquadro dove scrivi ci sono due bottoni: <b>✓ Impegno</b> e <b>📝 Annota</b>. Scegli cosa stai scrivendo e poi tocca <b>Cattura</b>: la cosa finisce già nel posto giusto. L'app si ricorda l'ultima scelta che hai fatto.</p>
+          <p>Il posto dove <b>butti dentro tutto al volo</b>: un'idea, una cosa da ricordare, un impegno. Scrivi e tocca <b>Cattura</b>, senza pensare a dove metterlo. Il tasto Invio della tastiera va a capo.</p>
           <ul>
             <li>Quello che scrivi qui diventa una cosa da fare.</li>
             <li>Resta in Cattura finché non lo sistemi: gli dai una raccolta o una data, oppure lo spunti.</li>
             <li>Il numero accanto al titolo dice quante cose aspettano di essere sistemate.</li>
           </ul>
           <h5>Scrivi la data come la diresti a voce</h5>
-          <p>Se nella frase metti <b>quando</b>, l'app lo capisce da sola e sistema data e ora. Mentre scrivi, sotto compare "Data capita" con il giorno che ha capito: così controlli prima di premere invio.</p>
+          <p>Se nella frase metti <b>quando</b>, l'app lo capisce da sola e sistema data e ora. Mentre scrivi, sotto compare "Data capita" con il giorno che ha capito: così controlli prima di toccare Cattura.</p>
           <ul>
             <li><b>"domani alle 9 riunione cantiere"</b> → domani, ore 9:00</li>
             <li><b>"venerdì chiamare il dentista"</b> → il prossimo venerdì</li>
@@ -1354,7 +1351,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>In alto</b> vedi la data, il giorno e l'eventuale festa.</li>
             <li><b>Tre modi di vedere la pagina</b>: <b>Checklist</b> (tutto l'elenco da spuntare), <b>Tappe</b> (un percorso: finisci una tappa e si sblocca la successiva), <b>Prossimo</b> (vedi solo la prossima cosa da fare).</li>
             <li>La <b>barra</b> ti dice quante cose hai fatto su quante ne avevi, in tutti e tre i modi.</li>
-            <li>Tocca il <b>+</b> in basso a destra: si apre una nuvoletta. <b>+ Impegno</b> apre la scheda completa. <b>+ Annota</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
+            <li>In basso a destra trovi <b>+ Impegno</b> e <b>+ Annota</b>. <b>+ Impegno</b> apre la scheda completa. <b>+ Annota</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
             <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche la sua pagina.</li>
           </ul>
         </div>
@@ -1826,7 +1823,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
           <h5>Che differenza c'è tra appunto e cosa da fare?</h5>
           <p>Le cose da fare hanno la casella da spuntare, il primo passo e possono andare in Adesso. Gli appunti servono per leggere e ricordare. Puoi cambiare tipo in qualsiasi momento dalla scheda.</p>
           <h5>L'app ha capito male la data.</h5>
-          <p>Apri l'elemento e correggi la data, oppure tocca "Togli data e ora". Prima di premere invio puoi sempre controllare cosa ha capito nella riga "Data capita".</p>
+          <p>Apri l'elemento e correggi la data, oppure tocca "Togli data e ora". Prima di toccare Cattura puoi sempre controllare cosa ha capito nella riga "Data capita".</p>
           <h5>L'app mi avvisa degli appuntamenti?</h5>
           <p>TestaLibera da sola no, quando è chiusa non manda notifiche. Ma puoi mandare l'impegno a <b>Google Calendar</b> con il bottone nella scheda: da lì il telefono ti avvisa.</p>
           <h5>Ho spuntato una cosa che si ripete, dov'è finita?</h5>
@@ -2599,7 +2596,7 @@ function renderOggiNotes(){
   $("oggiNotesCount").textContent=notes.length; $("oggiNotesCount").hidden=!notes.length;
   $("toNotes").hidden=!notes.length;
   const box=$("oggiNotes"); box.innerHTML="";
-  if(!notes.length){const e=document.createElement("div");e.className="empty";e.textContent="Nessun appunto. Nella Cattura scegli «📝 Appunto» per scriverne uno.";box.appendChild(e);return;}
+  if(!notes.length){const e=document.createElement("div");e.className="empty";e.textContent="Nessun appunto. Nella Cattura scegli «📝 Annota» per scriverne uno.";box.appendChild(e);return;}
   const l=document.createElement("div");l.className="list";fillList(l,notes.slice(0,3),null,{});box.appendChild(l);
   if(notes.length>3){
     const b=document.createElement("button");b.className="more-notes";b.textContent="+ Vedi tutti gli appunti ("+notes.length+")";
@@ -2927,6 +2924,7 @@ function fillEditor(){
   const it=find(edId); if(!it) return;
   $("edTitle").value=it.title; $("edBody").value=it.body;
   $("edType").querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed",String((b.dataset.type==="task")===it.task)));
+  $("edType").style.display=it.task?"none":""; $("edKind").hidden=!it.task;
   $("edCol").innerHTML=`<option value="">Cattura (da sistemare)</option>`+S.cols.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
   $("edCol").value=it.col||"";
   $("edDate").value=it.date||""; $("edTime").value=it.time||"";
@@ -3703,7 +3701,7 @@ function renderDayPage(pg,ds){
   pg.innerHTML=`<div class="qd-head"><div class="qd-num${red?" red":""}">${d.getDate()}</div><div class="qd-hd"><div class="qd-dow${red?" red":""}">${DAYS[d.getDay()]}</div><div class="qd-mon">${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>${f?`<span class="qd-feast${f.hol?" hol":""}">${esc(f.n)}</span>`:""}</div>${rel?`<span class="qd-rel">${rel}</span>`:""}</div>`
     +`<div class="qd-prog"><div class="qd-bar" role="progressbar" aria-label="Cose fatte" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${dn}"><i style="width:${pct}%"></i></div><span>${n?dn+" su "+n:"niente in programma"}</span></div>`;
   const box=document.createElement("div"); pg.appendChild(box);
-  if(!n) box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca il + in basso a destra.</div>`;
+  if(!n) box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca «+ Impegno» in basso a destra.</div>`;
   else if(mode==="path") qdPath(box,ents); else if(mode==="next") qdNextView(box,ents);
   else { box.className="list"; ents.forEach(e=>box.appendChild(itemRow(e.it,e.virt?{virtual:true}:{showDate:false}))); }
   // annotazioni del giorno: solo testo, non contano nella barra
@@ -3800,10 +3798,11 @@ const qdStep=n=>qdGo(ymd(addDays(parseYmd(calSel),n)));
 // ---------- tabs ----------
 const currentTab=()=>S.tab==="quad"?"cal":(S.tab||"oggi");
 function switchTab(t){
-  S.tab=t; save(); fabMenu(false);
+  S.tab=t; save();
   ["oggi","appunti","cal","liste","abit"].forEach(k=>{$("v-"+k).hidden=k!==t;});
   document.querySelectorAll(".tab").forEach(b=>{if(b.dataset.tab===t)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
-  $("fab").hidden=t==="oggi"||t==="abit"||t==="liste";
+  $("fab").hidden=t==="oggi"||t==="cal"||t==="abit"||t==="liste";
+  $("fabMenu").hidden=t!=="cal";
   $("fab").setAttribute("aria-label",{oggi:"Aggiungi alla Cattura",appunti:"Nuovo appunto",cal:"Nuovo impegno",abit:"Nuova abitudine"}[t]);
   renderView(); window.scrollTo(0,0);
 }
@@ -3857,7 +3856,6 @@ document.querySelectorAll(".cap-type button").forEach(b=>b.onclick=()=>{setCapTy
 setCapType(S.capType||"task");
 function capGrow(){const t=$("capInput");t.style.height="auto";t.style.height=Math.min(t.scrollHeight+2,260)+"px";$("capBtn").disabled=!t.value.trim();}
 $("capBtn").onclick=()=>{capture();capGrow();$("capInput").focus();};
-$("capInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();capture();capGrow();}});
 $("capInput").addEventListener("input",capGrow);
 capGrow();
 $("exRemove").onclick=()=>{
@@ -3878,18 +3876,13 @@ $("wkPrev").onclick=()=>{wkOff--;renderWeek();};
 $("wkNext").onclick=()=>{if(wkOff<0){wkOff++;renderWeek();}};
 $("revOpen").onclick=openReview;
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-function fabMenu(open){
-  $("fabMenu").hidden=!open; $("fab").classList.toggle("open",open);
-  $("fab").setAttribute("aria-expanded",String(open));
-}
-$("fmTask").onclick=()=>{fabMenu(false);newItem({task:true,date:calSel});};
-$("fmNote").onclick=()=>{fabMenu(false);qnOpen(null,calSel);};
-document.addEventListener("click",e=>{if(!$("fabMenu").hidden&&!e.target.closest("#fabMenu,#fab"))fabMenu(false);});
+$("fmTask").onclick=()=>newItem({task:true,date:calSel});
+$("fmNote").onclick=()=>qnOpen(null,calSel);
 $("fab").onclick=()=>{
   const t=currentTab();
   if(t==="oggi"){$("capInput").focus();$("capInput").scrollIntoView({behavior:"smooth",block:"center"});}
   else if(t==="appunti"){newItem({task:apFilter==="all",col:colById(apFilter)?apFilter:null,body:apTag?" #"+apTag:""},false);}
-  else if(t==="cal"){fabMenu(!$("fab").classList.contains("open"));}
+  else if(t==="cal"){newItem({task:true,date:calSel});}
   else {$("habInput").focus();}
 };
 $("apSearch").addEventListener("input",e=>{apQuery=e.target.value;renderAppunti();});
