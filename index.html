@@ -345,6 +345,16 @@ button{cursor:pointer}
 .qd-next .btn{width:100%;max-width:260px}
 .qd-next .qd-big{font-size:40px}
 .qd-link{display:inline-block;margin:10px 0 0;background:none;border:none;color:var(--violet);font-size:13px;font-weight:500;padding:4px 8px}
+.fab{transition:transform .2s ease}
+.fab.open{transform:rotate(45deg)}
+.fab-menu{position:fixed;right:max(16px, calc((100vw - 560px) / 2 + 16px));bottom:calc(146px + env(safe-area-inset-bottom, 0px));z-index:42;display:flex;flex-direction:column;align-items:flex-end;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:6px;box-shadow:var(--shadow-md);animation:fmIn .16s ease-out;transform-origin:bottom right}
+.fab-menu[hidden]{display:none}
+.fab-menu::after{content:"";position:absolute;right:22px;bottom:-7px;width:12px;height:12px;background:var(--surface);border-right:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.fab-menu button{display:inline-flex;align-items:center;gap:6px;width:auto;border:none;background:transparent;border-radius:10px;padding:8px 12px;font-family:var(--display);font-weight:600;font-size:14px;color:var(--ink);white-space:nowrap}
+.fab-menu button:active,.fab-menu button:hover{background:var(--sunk)}
+.fab-menu i{font-style:normal;font-size:12px;font-weight:700;line-height:1;width:16px;height:16px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--violet);color:var(--on-accent)}
+@keyframes fmIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){.fab,.fab-menu{transition:none;animation:none}}
 .qd-adds{display:flex;gap:8px;margin-top:10px}
 .cal-mode{margin-top:20px}
 .qd-adds .day-add{margin-top:0;flex:1}
@@ -868,7 +878,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 42 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 43 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -899,10 +909,6 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
       <button type="button" data-m="next" aria-pressed="false">➜ Prossimo</button>
     </div>
     <div class="qd-book" id="calBook"><div class="qd-page" id="calPage"></div></div>
-    <div class="qd-adds">
-      <button class="day-add" id="dayAdd">+ Impegno</button>
-      <button class="day-add" id="calNote">✎ Annotazione</button>
-    </div>
   </section>
 
   <!-- ABITUDINI -->
@@ -928,6 +934,10 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 </div>
 
 <button class="fab" id="fab" aria-label="Aggiungi">+</button>
+<div class="fab-menu" id="fabMenu" hidden>
+  <button type="button" id="fmTask"><i aria-hidden="true">+</i>Impegno</button>
+  <button type="button" id="fmNote"><i aria-hidden="true">+</i>Annota</button>
+</div>
 
 <nav class="tabbar" aria-label="Sezioni">
   <div class="tabbar-in">
@@ -1344,7 +1354,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>In alto</b> vedi la data, il giorno e l'eventuale festa.</li>
             <li><b>Tre modi di vedere la pagina</b>: <b>Checklist</b> (tutto l'elenco da spuntare), <b>Tappe</b> (un percorso: finisci una tappa e si sblocca la successiva), <b>Prossimo</b> (vedi solo la prossima cosa da fare).</li>
             <li>La <b>barra</b> ti dice quante cose hai fatto su quante ne avevi, in tutti e tre i modi.</li>
-            <li><b>+ Impegno</b> apre la scheda completa. <b>✎ Annotazione</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
+            <li>Tocca il <b>+</b> in basso a destra: si apre una nuvoletta. <b>+ Impegno</b> apre la scheda completa. <b>+ Annota</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
             <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche la sua pagina.</li>
           </ul>
         </div>
@@ -3693,7 +3703,7 @@ function renderDayPage(pg,ds){
   pg.innerHTML=`<div class="qd-head"><div class="qd-num${red?" red":""}">${d.getDate()}</div><div class="qd-hd"><div class="qd-dow${red?" red":""}">${DAYS[d.getDay()]}</div><div class="qd-mon">${MONTHS[d.getMonth()]} ${d.getFullYear()}</div>${f?`<span class="qd-feast${f.hol?" hol":""}">${esc(f.n)}</span>`:""}</div>${rel?`<span class="qd-rel">${rel}</span>`:""}</div>`
     +`<div class="qd-prog"><div class="qd-bar" role="progressbar" aria-label="Cose fatte" aria-valuemin="0" aria-valuemax="${n}" aria-valuenow="${dn}"><i style="width:${pct}%"></i></div><span>${n?dn+" su "+n:"niente in programma"}</span></div>`;
   const box=document.createElement("div"); pg.appendChild(box);
-  if(!n) box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca «+ Impegno» qui sotto.</div>`;
+  if(!n) box.innerHTML=`<div class="empty">Niente da fare in questo giorno.<br>Tocca il + in basso a destra.</div>`;
   else if(mode==="path") qdPath(box,ents); else if(mode==="next") qdNextView(box,ents);
   else { box.className="list"; ents.forEach(e=>box.appendChild(itemRow(e.it,e.virt?{virtual:true}:{showDate:false}))); }
   // annotazioni del giorno: solo testo, non contano nella barra
@@ -3790,7 +3800,7 @@ const qdStep=n=>qdGo(ymd(addDays(parseYmd(calSel),n)));
 // ---------- tabs ----------
 const currentTab=()=>S.tab==="quad"?"cal":(S.tab||"oggi");
 function switchTab(t){
-  S.tab=t; save();
+  S.tab=t; save(); fabMenu(false);
   ["oggi","appunti","cal","liste","abit"].forEach(k=>{$("v-"+k).hidden=k!==t;});
   document.querySelectorAll(".tab").forEach(b=>{if(b.dataset.tab===t)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
   $("fab").hidden=t==="oggi"||t==="abit"||t==="liste";
@@ -3868,19 +3878,24 @@ $("wkPrev").onclick=()=>{wkOff--;renderWeek();};
 $("wkNext").onclick=()=>{if(wkOff<0){wkOff++;renderWeek();}};
 $("revOpen").onclick=openReview;
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function fabMenu(open){
+  $("fabMenu").hidden=!open; $("fab").classList.toggle("open",open);
+  $("fab").setAttribute("aria-expanded",String(open));
+}
+$("fmTask").onclick=()=>{fabMenu(false);newItem({task:true,date:calSel});};
+$("fmNote").onclick=()=>{fabMenu(false);qnOpen(null,calSel);};
+document.addEventListener("click",e=>{if(!$("fabMenu").hidden&&!e.target.closest("#fabMenu,#fab"))fabMenu(false);});
 $("fab").onclick=()=>{
   const t=currentTab();
   if(t==="oggi"){$("capInput").focus();$("capInput").scrollIntoView({behavior:"smooth",block:"center"});}
   else if(t==="appunti"){newItem({task:apFilter==="all",col:colById(apFilter)?apFilter:null,body:apTag?" #"+apTag:""},false);}
-  else if(t==="cal"){newItem({task:true,date:calSel});}
+  else if(t==="cal"){fabMenu(!$("fab").classList.contains("open"));}
   else {$("habInput").focus();}
 };
 $("apSearch").addEventListener("input",e=>{apQuery=e.target.value;renderAppunti();});
 $("calPrev").onclick=()=>calMove(-1); $("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{calCursor=new Date();calCursor.setDate(1);calSel=today();renderCal();};
-$("dayAdd").onclick=()=>newItem({task:true,date:calSel});
 document.querySelectorAll(".qd-mode button").forEach(b=>b.onclick=()=>{S.qdMode=b.dataset.m;save();renderView();});
-$("calNote").onclick=()=>qnOpen(null,calSel);
 $("qnSave").onclick=$("qnX").onclick=()=>closeSheet("qnSheet");
 $("qnDel").onclick=()=>{$("qnText").value="";closeSheet("qnSheet");};
 (function(){const bk=$("calBook");let sx=null,sy=0;
