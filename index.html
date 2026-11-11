@@ -868,27 +868,8 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 41 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 42 · tutto resta su questo dispositivo</div>
     </footer>
-  </section>
-
-  <!-- QUADERNO -->
-  <section id="v-quad" class="view" hidden>
-    <div class="seg-ctl qd-mode" id="qdMode" role="group" aria-label="Come vedere la giornata">
-      <button type="button" data-m="check" aria-pressed="true">☑ Checklist</button>
-      <button type="button" data-m="path" aria-pressed="false">⛳ Tappe</button>
-      <button type="button" data-m="next" aria-pressed="false">➜ Prossimo</button>
-    </div>
-    <div class="qd-nav">
-      <button class="cal-nav" id="qdPrev" aria-label="Giorno prima">‹</button>
-      <button class="cal-today" id="qdToday">Oggi</button>
-      <button class="cal-nav" id="qdNext" aria-label="Giorno dopo">›</button>
-    </div>
-    <div class="qd-book" id="qdBook"><div class="qd-page" id="qdPage"></div></div>
-    <div class="qd-adds">
-      <button class="day-add" id="qdAdd">+ Impegno</button>
-      <button class="day-add" id="qdNote">✎ Annotazione</button>
-    </div>
   </section>
 
   <!-- APPUNTI -->
@@ -917,7 +898,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
       <button type="button" data-m="path" aria-pressed="false">⛳ Tappe</button>
       <button type="button" data-m="next" aria-pressed="false">➜ Prossimo</button>
     </div>
-    <div class="qd-book"><div class="qd-page" id="calPage"></div></div>
+    <div class="qd-book" id="calBook"><div class="qd-page" id="calPage"></div></div>
     <div class="qd-adds">
       <button class="day-add" id="dayAdd">+ Impegno</button>
       <button class="day-add" id="calNote">✎ Annotazione</button>
@@ -951,9 +932,8 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 <nav class="tabbar" aria-label="Sezioni">
   <div class="tabbar-in">
     <button class="tab" data-tab="oggi"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 11L12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5h4v5"/></svg></span>Home</button>
-    <button class="tab" data-tab="quad" aria-label="Pagina del giorno" title="Pagina del giorno"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v15"/><path d="M5.5 12.5l6.5 6.5 6.5-6.5"/></svg></span>&nbsp;</button>
+    <button class="tab" data-tab="cal" aria-label="Calendario" title="Calendario"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5v15"/><path d="M5.5 12.5l6.5 6.5 6.5-6.5"/></svg></span>&nbsp;</button>
     <button class="tab" data-tab="appunti"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/><path d="M9 13h7M9 17h5"/></svg></span>Appunti</button>
-    <button class="tab" data-tab="cal"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>Calendario</button>
     <button class="tab" data-tab="liste"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="5" height="5" rx="1.2"/><path d="M5.3 16.4l1.4 1.4 2.6-2.8"/><path d="M12.5 6.5H20M12.5 16.5H20"/></svg></span>Liste</button>
     <button class="tab" data-tab="abit"><span class="tab-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8"/></svg></span>Abitudini</button>
   </div>
@@ -1248,7 +1228,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
       <div class="help-nav" id="helpNav">
         <button class="pill" data-go="h-base">Le basi</button>
         <button class="pill" data-go="h-oggi">Home</button>
-        <button class="pill" data-go="h-quad">La freccia ↓</button>
+        <button class="pill" data-go="h-quad">Pagina del giorno</button>
         <button class="pill" data-go="h-appunti">Appunti</button>
         <button class="pill" data-go="h-cal">Calendario</button>
         <button class="pill" data-go="h-abit">Abitudini</button>
@@ -1284,11 +1264,10 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>Un appunto</b> (icona del foglio): qualcosa da leggere o ricordare, come una lista della spesa o un'idea.</li>
             <li><b>Una cosa da fare</b> (casella quadrata): qualcosa da spuntare quando l'hai fatta.</li>
           </ul>
-          <p>Se a un elemento dai una <b>data</b>, compare anche in Home, nella sezione con la freccia ↓ e nel Calendario. Puoi cambiare tutto quando vuoi: un appunto può diventare una cosa da fare, e viceversa.</p>
+          <p>Se a un elemento dai una <b>data</b>, compare anche in Home e nel Calendario. Puoi cambiare tutto quando vuoi: un appunto può diventare una cosa da fare, e viceversa.</p>
           <h5>Le cinque sezioni (barra in basso)</h5>
           <ul>
             <li><b>Home</b>: cosa faccio adesso e cosa mi aspetta.</li>
-            <li><b>La freccia ↓</b>: una pagina per ogni giorno, da spuntare e sfogliare.</li>
             <li><b>Appunti</b>: tutto quello che hai scritto, in ordine.</li>
             <li><b>Calendario</b>: le cose con una data, giorno per giorno.</li>
             <li><b>Liste</b>: elenchi da spuntare che riusi spesso, come la borsa della palestra.</li>
@@ -1357,17 +1336,16 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
       </details>
 
       <details class="hsec" id="h-quad">
-        <summary><span class="hico">📖</span><span class="htitle">La freccia ↓<small>una pagina per ogni giorno</small></span><span class="hchev">›</span></summary>
+        <summary><span class="hico">📖</span><span class="htitle">Pagina del giorno<small>nel Calendario, la freccia ↓</small></span><span class="hchev">›</span></summary>
         <div class="hbody">
-          <p>Ogni giorno è una pagina. Dentro trovi le <b>cose da fare</b> con quella data, le stesse del Calendario: se le spunti qui risultano spuntate anche lì, e viceversa.</p>
+          <p>Nel <b>Calendario</b> (la freccia ↓ nella barra in basso) tocca un giorno: sotto il mese vedi la sua pagina, con le <b>cose da fare</b> di quel giorno.</p>
           <ul>
-            <li><b>Sfoglia</b>: scorri col dito verso sinistra o verso destra, oppure usa ‹ e ›. <b>Torna a oggi</b> ti riporta alla pagina di oggi.</li>
+            <li><b>Sfoglia</b>: scorri col dito sulla pagina verso sinistra (giorno dopo) o verso destra (giorno prima). Il mese si sposta da solo. <b>Oggi</b>, in alto, ti riporta a oggi.</li>
             <li><b>In alto</b> vedi la data, il giorno e l'eventuale festa.</li>
             <li><b>Tre modi di vedere la pagina</b>: <b>Checklist</b> (tutto l'elenco da spuntare), <b>Tappe</b> (un percorso: finisci una tappa e si sblocca la successiva), <b>Prossimo</b> (vedi solo la prossima cosa da fare).</li>
             <li>La <b>barra</b> ti dice quante cose hai fatto su quante ne avevi, in tutti e tre i modi.</li>
             <li><b>+ Impegno</b> apre la scheda completa. <b>✎ Annotazione</b> apre una pagina dove scrivi e basta: la trovi in fondo alla pagina del giorno, toccala per modificarla.</li>
-            <li>La stessa pagina la vedi anche nel <b>Calendario</b>, quando tocchi un giorno.</li>
-            <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche nel quaderno.</li>
+            <li>Le pagine dei giorni passati restano: vedi cosa avevi in programma e cosa hai fatto. Se sposti una cosa a un altro giorno, si sposta anche la sua pagina.</li>
           </ul>
         </div>
       </details>
@@ -3677,7 +3655,7 @@ function whenLabel(date,time,p){
 // ---------- QUADERNO: una pagina per ogni giorno ----------
 // Legge le cose da fare dal calendario: quelle con la data del giorno restano lì anche dopo la spunta,
 // così sfogliando all'indietro vedi cosa avevi in programma e cosa hai fatto.
-let qdSel=today(), qdBusy=false;
+let qdBusy=false;
 const qdMode=()=>["check","path","next"].includes(S.qdMode)?S.qdMode:"check";
 const qdTitle=it=>it.title||prettyLine(firstLine(it.body))||"(senza titolo)";
 function easterOf(y){
@@ -3707,12 +3685,7 @@ function qdEntries(ds){
   return real.map(it=>({it,done:!!it.done,virt:false})).concat(virt.map(it=>({it,done:false,virt:true})));
 }
 function qdModeSync(){const m=qdMode();document.querySelectorAll(".qd-mode button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===m)));}
-function renderQuad(){
-  qdModeSync();
-  $("qdToday").textContent=qdSel===today()?"Oggi":"Torna a oggi";
-  renderDayPage($("qdPage"),qdSel);
-}
-// la pagina di un giorno: la usano la sezione con la freccia e il Calendario
+// la pagina di un giorno, sotto il Calendario
 function renderDayPage(pg,ds){
   const mode=qdMode(), t=today(), d=parseYmd(ds), f=feastOf(d), red=d.getDay()===0||(f&&f.hol);
   const rel=ds===t?"Oggi":ds===ymd(addDays(new Date(),1))?"Domani":ds===ymd(addDays(new Date(),-1))?"Ieri":"";
@@ -3740,7 +3713,7 @@ function renderDayPage(pg,ds){
 // ---------- annotazione: una pagina dove si scrive e basta ----------
 let qnItem=null, qnDate="";
 function qnOpen(it,ds){
-  qnItem=it||null; qnDate=it?it.date:(ds||qdSel);
+  qnItem=it||null; qnDate=it?it.date:(ds||calSel);
   $("qnText").value=it?it.body:"";
   const w=dayLabel(qnDate,true); $("qnWhen").textContent=w.charAt(0).toUpperCase()+w.slice(1);
   $("qnDel").hidden=!it;
@@ -3791,14 +3764,15 @@ function qdNextView(box,ents){
 }
 // sfoglia come un quaderno: avanti la pagina gira verso sinistra, indietro torna da sinistra
 function qdGo(ds){
-  if(qdBusy||ds===qdSel) return;
-  const dir=ds>qdSel?1:-1, book=$("qdBook"), pg=$("qdPage");
+  if(qdBusy||ds===calSel) return;
+  const dir=ds>calSel?1:-1, book=$("calBook"), pg=$("calPage");
+  const go=()=>{calSel=ds;const d=parseYmd(ds);if(d.getMonth()!==calCursor.getMonth()||d.getFullYear()!==calCursor.getFullYear())calCursor=new Date(d.getFullYear(),d.getMonth(),1);renderCal();};
   const still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(still||!pg.animate){qdSel=ds;renderQuad();return;}
+  if(still||!pg.animate){go();return;}
   qdBusy=true;
   const ghost=pg.cloneNode(true); ghost.removeAttribute("id"); ghost.classList.add("qd-ghost"); ghost.setAttribute("aria-hidden","true");
   book.appendChild(ghost);
-  qdSel=ds; renderQuad();
+  go();
   const opt={duration:600,easing:"cubic-bezier(.45,.05,.3,1)"};
   let a, inc=null;
   if(dir>0) a=ghost.animate([{transform:"rotateY(0deg)",filter:"brightness(1)"},{transform:"rotateY(-180deg)",filter:"brightness(.7)"}],opt);
@@ -3811,21 +3785,21 @@ function qdGo(ds){
   a.onfinish=end; a.oncancel=end; setTimeout(end,1000);
   if(navigator.vibrate)navigator.vibrate(8);
 }
-const qdStep=n=>qdGo(ymd(addDays(parseYmd(qdSel),n)));
+const qdStep=n=>qdGo(ymd(addDays(parseYmd(calSel),n)));
 
 // ---------- tabs ----------
-const currentTab=()=>S.tab||"oggi";
+const currentTab=()=>S.tab==="quad"?"cal":(S.tab||"oggi");
 function switchTab(t){
   S.tab=t; save();
-  ["oggi","quad","appunti","cal","liste","abit"].forEach(k=>{$("v-"+k).hidden=k!==t;});
+  ["oggi","appunti","cal","liste","abit"].forEach(k=>{$("v-"+k).hidden=k!==t;});
   document.querySelectorAll(".tab").forEach(b=>{if(b.dataset.tab===t)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
-  $("fab").hidden=t==="oggi"||t==="quad"||t==="abit"||t==="liste";
+  $("fab").hidden=t==="oggi"||t==="abit"||t==="liste";
   $("fab").setAttribute("aria-label",{oggi:"Aggiungi alla Cattura",appunti:"Nuovo appunto",cal:"Nuovo impegno",abit:"Nuova abitudine"}[t]);
   renderView(); window.scrollTo(0,0);
 }
 function renderView(){
   const t=currentTab();
-  if(t==="oggi") renderOggi(); else if(t==="quad") renderQuad(); else if(t==="appunti") renderAppunti(); else if(t==="cal") renderCal(); else if(t==="liste") renderLists(); else renderHabits();
+  if(t==="oggi") renderOggi(); else if(t==="appunti") renderAppunti(); else if(t==="cal") renderCal(); else if(t==="liste") renderLists(); else renderHabits();
 }
 function renderAll(){renderHeader();renderView();if($("archSheet").classList.contains("show"))renderArchive();}
 
@@ -3906,21 +3880,16 @@ $("calPrev").onclick=()=>calMove(-1); $("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{calCursor=new Date();calCursor.setDate(1);calSel=today();renderCal();};
 $("dayAdd").onclick=()=>newItem({task:true,date:calSel});
 document.querySelectorAll(".qd-mode button").forEach(b=>b.onclick=()=>{S.qdMode=b.dataset.m;save();renderView();});
-$("qdPrev").onclick=()=>qdStep(-1);
-$("qdNext").onclick=()=>qdStep(1);
-$("qdToday").onclick=()=>qdGo(today());
-$("qdAdd").onclick=()=>newItem({task:true,date:qdSel});
-$("qdNote").onclick=()=>qnOpen(null,qdSel);
 $("calNote").onclick=()=>qnOpen(null,calSel);
 $("qnSave").onclick=$("qnX").onclick=()=>closeSheet("qnSheet");
 $("qnDel").onclick=()=>{$("qnText").value="";closeSheet("qnSheet");};
-(function(){const bk=$("qdBook");let sx=null,sy=0;
+(function(){const bk=$("calBook");let sx=null,sy=0;
   bk.addEventListener("touchstart",e=>{if(e.touches.length!==1){sx=null;return;}sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
   bk.addEventListener("touchend",e=>{if(sx==null)return;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;sx=null;
     if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.4)qdStep(dx<0?1:-1);},{passive:true});
 })();
 document.addEventListener("keydown",e=>{
-  if(currentTab()!=="quad"||openSheets.length) return;
+  if(currentTab()!=="cal"||openSheets.length) return;
   const tg=e.target&&e.target.tagName; if(tg==="INPUT"||tg==="TEXTAREA") return;
   if(e.key==="ArrowLeft") qdStep(-1); else if(e.key==="ArrowRight") qdStep(1);
 });
