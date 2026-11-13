@@ -571,6 +571,17 @@ a.toast-action{text-decoration:none}
 .ls-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px}
 .ls-bar .ls-need-count{margin-top:0}
 .ls-sort{background:var(--surface);border:1px solid var(--line-strong);border-radius:10px;padding:7px 12px;font-family:var(--display);font-weight:700;font-size:13px;color:var(--ink);flex-shrink:0}
+.ls-need-open{display:inline-flex;align-items:center;gap:7px;background:var(--blue);color:var(--paper);border:none;border-radius:11px;padding:9px 14px;font-family:var(--display);font-weight:700;font-size:14px}
+.ls-need-open b{background:var(--paper);color:var(--blue);border-radius:99px;padding:1px 8px;font-size:13px}
+.ls-back{width:100%;margin-bottom:12px}
+.ls-need-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.ls-need-head b{font-family:var(--display);font-size:19px}
+.ls-need-head span{font-size:13px;color:var(--ink-faint);font-weight:600}
+.ls-need-prog{height:6px;border-radius:99px;background:var(--blue-soft);margin:10px 0 12px;overflow:hidden}
+.ls-need-prog i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .3s}
+.ls-row.ls-big{padding:12px 12px;min-height:54px}
+.ls-row.ls-big .ls-text{font-size:16.5px}
+.ls-row.ls-big.on .ls-text{text-decoration:line-through;opacity:.6}
 .ls-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .ls-tools .btn{flex:1 1 140px;font-size:13.5px;padding:11px}
 
@@ -874,7 +885,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
 
     <footer>
       <div class="quote" id="quote"></div>
-      <div class="stamp">TestaLibera · versione 44 · tutto resta su questo dispositivo</div>
+      <div class="stamp">TestaLibera · versione 45 · tutto resta su questo dispositivo</div>
     </footer>
   </section>
 
@@ -1468,6 +1479,7 @@ body.res-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top, 0px))}
             <li><b>Spuntare (verde)</b>: apri la lista e tocca la casella quadrata accanto a ogni voce quando l'hai fatta o presa. Quando le hai spuntate tutte compare "Lista completa ✓".</li>
             <li><b>"Mi serve adesso" (blu)</b>: subito a destra della casella verde c'è un <b>cerchio blu</b>. Toccalo e tutta la riga diventa <b>blu</b>. Esempio: la lista della spesa ha 30 cose, ma oggi te ne servono 5. Le tocchi in blu e al supermercato vedi a colpo d'occhio cosa comprare. Il resto della lista resta lì, bianco. Quando prendi una cosa, spuntala in verde.</li>
             <li>Nella sezione Liste, sotto ogni lista, vedi quante cose blu hai ancora da prendere. <b>"Togli tutti i blu"</b> li spegne tutti insieme.</li>
+            <li><b>🛒 Da prendere</b>: quando hai segnato in blu qualche voce, in alto nella lista compare il pulsante blu <b>"🛒 Da prendere"</b>. Toccalo e vedi <b>solo le voci blu</b>, grandi, con una barra che si riempie man mano che le prendi. Tocca una voce (o il quadratino) quando l'hai presa: scende in fondo, barrata. Alla fine puoi toccare <b>"Togli dalla lista da prendere quelle già prese"</b>. Con <b>"← Tutta la lista"</b> torni alla lista completa.</li>
             <li><b>Ordinare</b>: tocca <b>"A→Z Ordina"</b> sopra le voci e la lista si mette in ordine alfabetico. Se cambi idea, tocca "Annulla".</li>
             <li><b>Colore</b>: apri la lista e scegli un colore sotto il nome. La lista si colora anche nella sezione Liste, così la riconosci subito.</li>
             <li><b>Modificare</b>: tocca il testo di una voce per cambiarlo, la <b>×</b> per toglierla. In alto puoi cambiare il nome della lista.</li>
@@ -3378,8 +3390,8 @@ function addList(){
   const l={id:uid(),name:v,items:[],reset:"manual",lastReset:today()};
   S.lists.unshift(l); i.value=""; save(); renderLists(); openList(l.id,true);
 }
-let lsId=null;
-function openList(id,isNew){lsId=id;renderListSheet(isNew);openSheet("listSheet");if(isNew)setTimeout(()=>{const x=$("lsNew");if(x)x.focus();},300);}
+let lsId=null, lsNeedMode=false;
+function openList(id,isNew){lsId=id;lsNeedMode=false;renderListSheet(isNew);openSheet("listSheet");if(isNew)setTimeout(()=>{const x=$("lsNew");if(x)x.focus();},300);}
 // trascinare le voci: tieni premuto e sposta
 const lsDrag={justDropped:false};
 function enableListDrag(box,l){
@@ -3430,12 +3442,15 @@ function renderListSheet(){
   $("lsSub").textContent=n?d+" di "+n+" spuntate":"ancora vuota";
   const body=$("lsBody");
   const needN=l.items.filter(x=>x.need&&!x.done&&x.text.trim()).length;
+  const needAll=l.items.filter(x=>x.need&&x.text.trim());
+  if(lsNeedMode&&!needAll.length) lsNeedMode=false;
+  if(lsNeedMode){ renderNeedMode(l,needAll); return; }
   body.innerHTML=`<label class="ed-label" for="lsName">Nome della lista</label>
     <input class="ls-name" id="lsName" type="text" value="${esc(l.name)}" autocomplete="off">
     <span class="flabel" style="margin-top:12px;display:block">Colore della lista</span>
     <div class="swatches ls-sw" id="lsSw"></div>
     <div class="ls-legend"><span><i></i>verde = fatto / preso</span><span><i class="b"></i>blu = mi serve adesso</span></div>
-    <div class="ls-bar">${needN?`<span class="ls-need-count">● ${needN} ${needN===1?"cosa da prendere":"cose da prendere"}</span>`:"<span></span>"}<button class="ls-sort" id="lsSort" aria-label="Ordina in ordine alfabetico">A→Z Ordina</button></div>
+    <div class="ls-bar">${needAll.length?`<button class="ls-need-open" id="lsNeedOpen">🛒 Da prendere <b>${needN}</b></button>`:"<span></span>"}<button class="ls-sort" id="lsSort" aria-label="Ordina in ordine alfabetico">A→Z Ordina</button></div>
     <div class="ls-items" id="lsItems"></div>
     <div class="ls-hint">Tocca una voce per modificarla · tienila premuta per spostarla</div>
     <div class="sub-add" style="margin-top:10px"><input type="text" id="lsNew" placeholder="Aggiungi una voce…" autocomplete="off" enterkeyhint="done"><button id="lsNewBtn" aria-label="Aggiungi voce">+</button></div>
@@ -3465,6 +3480,7 @@ function renderListSheet(){
     items.appendChild(r);
   });
   enableListDrag(items,l);
+  const no=$("lsNeedOpen"); if(no) no.onclick=()=>{lsNeedMode=true;renderListSheet();$("lsBody").scrollTop=0;};
   if(!l.items.length) items.innerHTML=`<div class="empty" style="padding:8px">Scrivi la prima voce qui sotto.</div>`;
   $("lsName").oninput=e=>{l.name=e.target.value;save();};
   $("lsName").onblur=e=>{if(!e.target.value.trim()){l.name="Lista";e.target.value=l.name;save();}};
@@ -3489,6 +3505,35 @@ function renderListSheet(){
   $("lsRestart").onclick=()=>{const prev=l.items.map(z=>z.done);l.items.forEach(z=>z.done=false);l.lastReset=today();save();renderListSheet();
     toast("Spunte tolte","Annulla",()=>{l.items.forEach((z,k)=>z.done=prev[k]);save();renderListSheet();});};
   $("lsDel").onclick=()=>askConfirm(`Eliminare la lista?\n\n"${l.name}"`,()=>{S.lists=S.lists.filter(z=>z.id!==l.id);save();closeSheet("listSheet");renderAll();});
+}
+
+// ---------- lista: solo le cose segnate in blu ----------
+function renderNeedMode(l,needAll){
+  const body=$("lsBody");
+  const taken=needAll.filter(x=>x.done).length, tot=needAll.length;
+  $("lsSub").textContent=taken+" di "+tot+" prese";
+  const order=needAll.filter(x=>!x.done).concat(needAll.filter(x=>x.done));
+  body.innerHTML=`<button class="btn btn-quiet ls-back" id="lsNeedBack">← Tutta la lista</button>
+    <div class="ls-need-head"><b>🛒 Da prendere</b><span>${tot-taken?`ne mancano ${tot-taken}`:"preso tutto ✓"}</span></div>
+    <div class="ls-need-prog"><i style="width:${tot?Math.round(taken/tot*100):0}%"></i></div>
+    <div class="ls-items" id="lsItems"></div>
+    <div class="ls-hint">Spunta il quadratino quando l'hai preso. Qui vedi solo le voci segnate in blu.</div>
+    ${taken?`<div class="ls-tools"><button class="btn btn-quiet" id="lsNeedClear">Togli dalla lista "da prendere" quelle già prese</button></div>`:""}`;
+  const items=$("lsItems");
+  order.forEach(x=>{
+    const r=document.createElement("div"); r.className="ls-row need ls-big"+(x.done?" on":"");
+    r.innerHTML=`<button class="chk${x.done?" on":""}" aria-label="${x.done?"Togli la spunta":"Preso"}">${x.done?"✓":""}</button><span class="ls-text">${esc(x.text)}</span>`;
+    const tick=()=>{x.done=!x.done;save();if(navigator.vibrate)navigator.vibrate(15);renderListSheet();
+      if(x.done&&needAll.every(z=>z.done)) toast("Preso tutto ✓");};
+    r.children[0].onclick=tick; r.children[1].onclick=tick;
+    items.appendChild(r);
+  });
+  $("lsNeedBack").onclick=()=>{lsNeedMode=false;renderListSheet();};
+  const c=$("lsNeedClear"); if(c) c.onclick=()=>{
+    const got=needAll.filter(x=>x.done), prev=got.map(x=>({x,done:x.done,need:x.need}));
+    got.forEach(x=>{x.need=false;x.done=false;}); save(); renderListSheet();
+    toast(got.length+(got.length===1?" voce tolta":" voci tolte")+" dal blu","Annulla",()=>{prev.forEach(o=>{o.x.need=o.need;o.x.done=o.done;});save();renderListSheet();});
+  };
 }
 
 // ---------- archive ----------
